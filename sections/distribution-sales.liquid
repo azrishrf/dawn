@@ -1,0 +1,545 @@
+{% comment %}
+  Distribution & Sales Channels Section
+  Displays sales strategy, platform logos, live commerce, and authorized distributors
+{% endcomment %}
+
+<style>
+  .distribution-sales-section {
+    width: 100%;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 32px 0;
+    margin: 0;
+  }
+
+  .distribution-sales-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-container {
+      padding: 0 48px;
+    }
+  }
+
+  .distribution-sales-subtitle {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+    margin: 0 0 16px 0;
+  }
+
+  .distribution-sales-title {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin: 0 0 24px 0;
+  }
+
+  @media (min-width: 768px) {
+    .distribution-sales-title {
+      margin: 0 0 32px 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-title {
+      font-size: 36px;
+    }
+  }
+
+  /* Main Content Wrapper */
+  .distribution-sales-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Header Section */
+  .distribution-sales-header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  @media (min-width: 768px) {
+    .distribution-sales-header {
+      flex-direction: row;
+      gap: 80px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-header {
+      gap: 80px;
+    }
+  }
+
+  .distribution-sales-text-content {
+    flex: 1;
+  }
+
+  .distribution-sales-description {
+    color: black;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    font-size: 16px;
+  }
+
+  .distribution-sales-description p {
+    margin: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-description {
+      margin: 0 0 40px 0;
+      font-size: 18px;
+    }
+  }
+
+  /* Platform Logos */
+  .distribution-sales-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px;
+  }
+
+  .distribution-sales-logo-wrapper {
+    width: 160px;
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-logo-wrapper {
+      width: 176px;
+    }
+  }
+
+  .distribution-sales-logo-wrapper.shopee {
+    width: 128px;
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-logo-wrapper.shopee {
+      width: 144px;
+    }
+  }
+
+  .distribution-sales-logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  /* Live Commerce Grid */
+  .distribution-sales-live-commerce {
+    flex: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .distribution-sales-live-commerce {
+      gap: 24px;
+    }
+  }
+
+  .live-commerce-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+  }
+
+  .live-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+    background-color: #e31e24;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .live-commerce-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+
+  .live-commerce-item:hover .live-commerce-image {
+    transform: scale(1.1);
+  }
+
+  .live-commerce-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+  }
+
+  /* Authorized Distributor Section */
+  .authorized-distributor-section {
+    background-color: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  .authorized-distributor-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 768px) {
+    .authorized-distributor-content {
+      flex-direction: row;
+    }
+  }
+
+  .authorized-distributor-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 320px;
+  }
+
+  @media (min-width: 1024px) {
+    .authorized-distributor-image-wrapper {
+      width: 50%;
+      aspect-ratio: auto;
+    }
+  }
+
+  .authorized-distributor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 339 / 242;
+  }
+
+  .distributor-badge {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+  }
+
+  .distributor-badge-inner {
+    background-color: #e31e24;
+    color: #ffffff;
+    padding: 2px 14px;
+    font-size: 14px;
+    border-radius: 9999px;
+    font-weight: bold;
+    display: inline-block;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .authorized-distributor-text {
+    width: 100%;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #000000;
+  }
+
+  @media (min-width: 1024px) {
+    .authorized-distributor-text {
+      width: 50%;
+      padding: 64px;
+    }
+  }
+
+  .authorized-distributor-heading {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+  }
+
+  @media (min-width: 768px) {
+    .authorized-distributor-heading {
+      font-size: 24px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .authorized-distributor-heading {
+      font-size: 28px;
+    }
+  }
+
+  .authorized-distributor-description {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  .authorized-distributor-description .brand-name {
+    font-weight: bold;
+  }
+</style>
+
+<section class="distribution-sales-section">
+  <div class="distribution-sales-container">
+    <h3 class="distribution-sales-subtitle">
+      {{ section.settings.subtitle }}
+    </h3>
+    <h2 class="distribution-sales-title">
+      {{ section.settings.title }}
+    </h2>
+
+    <div class="distribution-sales-content">
+      <div class="distribution-sales-header">
+        <div class="distribution-sales-text-content">
+          <div class="distribution-sales-description">
+            {{ section.settings.description }}
+          </div>
+
+          <!-- Platform Logos -->
+          <div class="distribution-sales-logos">
+            {% if section.settings.tiktok_logo %}
+              <div class="distribution-sales-logo-wrapper">
+                <img
+                  src="{{ section.settings.tiktok_logo | img_url: '352x' }}"
+                  alt="TikTok Shop"
+                  class="distribution-sales-logo"
+                  width="176"
+                  height="auto"
+                  loading="lazy"
+                >
+              </div>
+            {% endif %}
+            {% if section.settings.shopee_logo %}
+              <div class="distribution-sales-logo-wrapper shopee">
+                <img
+                  src="{{ section.settings.shopee_logo | img_url: '288x' }}"
+                  alt="Shopee"
+                  class="distribution-sales-logo"
+                  width="144"
+                  height="auto"
+                  loading="lazy"
+                >
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Live Commerce Images -->
+        <div class="distribution-sales-live-commerce">
+          {% if section.settings.live_host_1_image %}
+            <div class="live-commerce-item">
+              <div class="live-badge">LIVE</div>
+              <img
+                src="{{ section.settings.live_host_1_image | img_url: '600x' }}"
+                alt="{{ section.settings.live_host_1_alt }}"
+                class="live-commerce-image"
+                width="600"
+                height="750"
+                loading="lazy"
+              >
+              <div class="live-commerce-overlay"></div>
+            </div>
+          {% endif %}
+          {% if section.settings.live_host_2_image %}
+            <div class="live-commerce-item">
+              <div class="live-badge">LIVE</div>
+              <img
+                src="{{ section.settings.live_host_2_image | img_url: '600x' }}"
+                alt="{{ section.settings.live_host_2_alt }}"
+                class="live-commerce-image"
+                width="600"
+                height="750"
+                loading="lazy"
+              >
+              <div class="live-commerce-overlay"></div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Authorized Distributor Section -->
+      <div class="authorized-distributor-section">
+        <div class="authorized-distributor-content">
+          <!-- Image Side -->
+          <div class="authorized-distributor-image-wrapper">
+            {% if section.settings.distributor_image %}
+              <img
+                src="{{ section.settings.distributor_image | img_url: '1356x' }}"
+                alt="{{ section.settings.distributor_image_alt }}"
+                class="authorized-distributor-image"
+                width="678"
+                height="484"
+                loading="lazy"
+              >
+            {% endif %}
+            <div class="distributor-badge">
+              <div class="distributor-badge-inner">
+                {{ section.settings.distributor_badge }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Text Side -->
+          <div class="authorized-distributor-text">
+            <h3 class="authorized-distributor-heading">
+              {{ section.settings.distributor_heading }}
+            </h3>
+            <p class="authorized-distributor-description">
+              <span class="brand-name">{{ section.settings.brand_name }}</span>
+              {{ section.settings.distributor_description_part1 }}
+              <span class="brand-name">{{ section.settings.distributor_names }}</span>
+              {{- section.settings.distributor_description_part2 }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Distribution & Sales",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Sales Strategy"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "DISTRIBUTION & SALES CHANNELS"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>OnTheGo operates through a strong omni-channel sales strategy, with primary online sales conducted via TikTok Shop and Shopee, supported by high-performing live commerce and digital marketing campaigns.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Platform Logos"
+    },
+    {
+      "type": "image_picker",
+      "id": "tiktok_logo",
+      "label": "TikTok Shop Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "shopee_logo",
+      "label": "Shopee Logo"
+    },
+    {
+      "type": "header",
+      "content": "Live Commerce"
+    },
+    {
+      "type": "image_picker",
+      "id": "live_host_1_image",
+      "label": "Live Host 1 Image"
+    },
+    {
+      "type": "text",
+      "id": "live_host_1_alt",
+      "label": "Live Host 1 Alt Text",
+      "default": "Live Commerce Host 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "live_host_2_image",
+      "label": "Live Host 2 Image"
+    },
+    {
+      "type": "text",
+      "id": "live_host_2_alt",
+      "label": "Live Host 2 Alt Text",
+      "default": "Live Commerce Host 2"
+    },
+    {
+      "type": "header",
+      "content": "Authorized Distributors"
+    },
+    {
+      "type": "image_picker",
+      "id": "distributor_image",
+      "label": "Distributor Store Image"
+    },
+    {
+      "type": "text",
+      "id": "distributor_image_alt",
+      "label": "Distributor Image Alt Text",
+      "default": "Authorized Distributor Store"
+    },
+    {
+      "type": "text",
+      "id": "distributor_badge",
+      "label": "Distributor Badge Text",
+      "default": "Gorilla Nutrition"
+    },
+    {
+      "type": "text",
+      "id": "distributor_heading",
+      "label": "Distributor Heading",
+      "default": "Authorized Distributors"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "OnTheGo"
+    },
+    {
+      "type": "textarea",
+      "id": "distributor_description_part1",
+      "label": "Distributor Description Part 1",
+      "default": "works with authorized distributors, including some of the largest and most established supplement retailers in Malaysia, such as"
+    },
+    {
+      "type": "text",
+      "id": "distributor_names",
+      "label": "Distributor Names (Bold)",
+      "default": "Gorilla Nutrition, WDC Nutrition, Empayar Bina Badan, and Malaysia Supplement"
+    },
+    {
+      "type": "textarea",
+      "id": "distributor_description_part2",
+      "label": "Distributor Description Part 2",
+      "default": ". Regionally, the brand is also distributed through Beastmode Brunei, one of the largest supplement stores in Brunei."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Distribution & Sales"
+    }
+  ]
+}
+{% endschema %}

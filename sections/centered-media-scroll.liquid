@@ -1,0 +1,311 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .centered-media-scroll-container {
+    padding-left: {{ section.settings.container_padding_mobile }}px;
+    padding-right: {{ section.settings.container_padding_mobile }}px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .centered-media-header {
+    text-align: center;
+    /* margin-bottom: 10px; */
+  }
+
+  .centered-media-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0 0 10px 0;
+    letter-spacing: 0.025em;
+  }
+
+  @media (min-width: 768px) {
+    .centered-media-title {
+      font-size: 28px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .centered-media-title {
+      font-size: 36px;
+    }
+  }
+
+  .centered-media-description {
+    font-size: 15px;
+    /* line-height: 1.6; */
+    color: {{ section.settings.description_color }};
+    margin: 0 auto 30px;
+    max-width: 1000px;
+    text-align: {{ section.settings.mobile_description_alignment }}; /* Mobile alignment */
+  }
+
+  @media (min-width: 768px) {
+    .centered-media-description {
+      font-size: 16px;
+      text-align: center; /* Always center on tablet and desktop */
+    }
+  }
+
+  .centered-media-scroll-wrapper {
+    display: flex;
+    flex-direction: column; /* Mobile: Column */
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .centered-media-block {
+    width: 100%;
+  }
+
+  /* Tablet: Flex Row */
+  @media screen and (min-width: 768px) {
+    .centered-media-scroll-wrapper {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .centered-media-block {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  /* Desktop: Flex Row + custom padding */
+  @media screen and (min-width: 990px) {
+    .centered-media-scroll-container {
+      padding-left: {{ section.settings.container_padding_desktop }}px;
+      padding-right: {{ section.settings.container_padding_desktop }}px;
+    }
+  }
+
+  .centered-media-item {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    border-radius: 0; /* No border radius on mobile for full width */
+  }
+
+  @media screen and (min-width: 768px) {
+    .centered-media-item {
+      border-radius: 12px; /* Add border radius on tablet and up */
+    }
+  }
+
+  video.centered-media-item {
+      width: 100%;
+      height: auto;
+  }
+
+  @media screen and (min-width: 768px) {
+    .centered-media-item {
+      max-height: {{ section.settings.media_height }}px;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain; /* revert to contain for desktop */
+    }
+    video.centered-media-item {
+      max-height: {{ section.settings.media_height }}px;
+      width: auto;
+    }
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.section_color_scheme }}">
+  <div class="centered-media-scroll-container">
+    {% if section.settings.title != blank %}
+      <div class="centered-media-header">
+        <h2 class="centered-media-title">{{ section.settings.title }}</h2>
+        {% if section.settings.description != blank %}
+          <p class="centered-media-description">{{ section.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="centered-media-scroll-wrapper scroll-trigger animate--slide-in">
+      {%- for block in section.blocks -%}
+        <div class="centered-media-block" {{ block.shopify_attributes }}>
+          {%- case block.type -%}
+            {%- when 'image' -%}
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 1500
+                  | image_tag: class: 'centered-media-item', loading: 'lazy'
+                }}
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg centered-media-item' }}
+              {%- endif -%}
+            {%- when 'video' -%}
+              {%- if block.settings.video != blank -%}
+                {{
+                  block.settings.video
+                  | video_tag: autoplay: true, loop: true, muted: true, controls: false, class: 'centered-media-item'
+                }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg centered-media-item' }}
+              {%- endif -%}
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Centered Media Scroll",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Featured Media"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section Description",
+      "default": "Discover our collection of stunning visuals"
+    },
+    {
+      "type": "range",
+      "id": "media_height",
+      "min": 200,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "label": "Desktop Media Max Height",
+      "default": 720
+    },
+    {
+      "type": "color_scheme",
+      "id": "section_color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "select",
+      "id": "mobile_description_alignment",
+      "label": "Description Alignment (Mobile)",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "container_padding_mobile",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Container Padding (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "container_padding_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Container Padding (Desktop)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Centered Media Scroll",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

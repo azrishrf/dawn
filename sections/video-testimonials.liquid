@@ -1,0 +1,536 @@
+{% comment %}
+  Video Testimonials Section - Slider
+  Displays video testimonials in a horizontal slider with play controls
+{% endcomment %}
+
+<style>
+  .video-testimonials-section {
+    background-color: #ffffff;
+    {% comment %} padding: 15px 0; {% endcomment %}
+    position: relative;
+  }
+
+  .video-testimonials-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .video-testimonials-container {
+      padding: 40px 30px 10px;
+    }
+  }
+
+  .video-testimonials-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .video-testimonials-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0;
+    {% comment %} letter-spacing: 0.025em; {% endcomment %}
+  }
+
+  @media (min-width: 768px) {
+    .video-testimonials-title {
+      font-size: 28px;
+    }
+  }
+
+
+  @media (min-width: 1024px) {
+    .video-testimonials-title {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+  }
+
+  .video-slider-wrapper {
+    position: relative;
+    /* Ensure arrows can be positioned outside if needed, or inside */
+  }
+
+  .video-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 10px;
+    {% comment %} padding-bottom: 16px; {% endcomment %}
+  }
+
+  .video-slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .video-item {
+    flex: 0 0 180px;
+    scroll-snap-align: start;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    cursor: pointer;
+  }
+
+  @media (min-width: 768px) {
+    .video-item {
+      flex: 0 0 240px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .video-item {
+      flex: 0 0 auto;
+      max-width: 240px;
+      width: calc((100% - (var(--items-count, 4) * 16px)) / var(--items-count, 4));
+    }
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  .video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-play-button {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    z-index: 10;
+    padding: 0;
+  }
+
+  .video-play-button:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+  }
+
+  .video-play-button.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .video-play-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  /* Slider Navigation Arrows */
+  .slider-arrow {
+    display: none; /* Hidden on mobile by default */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s ease;
+  }
+
+  .slider-arrow:hover {
+    background-color: #f9fafb;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .slider-arrow-left {
+    left: -50px;
+  }
+
+  .slider-arrow-right {
+    right: -50px;
+  }
+
+  .slider-arrow svg {
+    width: 20px;
+    height: 20px;
+    fill: #000000;
+  }
+
+  @media (min-width: 1024px) {
+    .slider-arrow {
+      display: flex;
+    }
+  }
+
+  .slider-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Dot Indicators */
+  .video-slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .video-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+
+  .video-dot.active {
+    background-color: #000000;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .video-dot:hover {
+    background-color: #6b7280;
+  }
+</style>
+
+<div class="video-testimonials-section">
+  <div class="video-testimonials-container">
+    {% if section.settings.title != blank %}
+      <div class="video-testimonials-header">
+        <h2 class="video-testimonials-title">{{ section.settings.title }}</h2>
+      </div>
+    {% endif %}
+
+    <div class="video-slider-wrapper">
+      <button class="slider-arrow slider-arrow-left" id="prev-arrow-{{ section.id }}" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </button>
+
+      <div class="video-slider-container" id="video-slider-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'video' %}
+            <div class="video-item" data-video-item data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+              <div class="video-wrapper">
+                {% if block.settings.video != blank %}
+                  <video
+                    class="video-element"
+                    data-video-element
+                    loop
+                    playsinline
+                    muted
+                    preload="metadata"
+                    poster="{{ block.settings.video.preview_image | image_url: width: 400 }}"
+                  >
+                    {% for source in block.settings.video.sources %}
+                      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                    {% endfor %}
+                    Your browser does not support the video tag.
+                  </video>
+
+                  <button class="video-play-button" data-play-button aria-label="Play video">
+                    <svg class="video-play-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 5v14l11-7L8 5z" fill="#000000"/>
+                    </svg>
+                  </button>
+                {% else %}
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #6b7280; font-size: 12px;">
+                    <p>Upload a video</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button class="slider-arrow slider-arrow-right" id="next-arrow-{{ section.id }}" aria-label="Next slide">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </button>
+
+      {% comment %} <div class="video-slider-dots" id="video-dots-{{ section.id }}"></div> {% endcomment %}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('video-slider-' + sectionId);
+    const prevArrow = document.getElementById('prev-arrow-' + sectionId);
+    const nextArrow = document.getElementById('next-arrow-' + sectionId);
+    const dotsContainer = document.getElementById('video-dots-' + sectionId);
+
+    if (!slider) return;
+
+    const videoItems = slider.querySelectorAll('[data-video-item]');
+    const totalItems = videoItems.length;
+
+    let currentIndex = 0;
+
+    // Update arrow visibility based on scroll position
+    function updateArrowVisibility() {
+      if (!prevArrow || !nextArrow) return;
+
+      const scrollLeft = slider.scrollLeft;
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+      // Hide previous arrow if at the start
+      if (scrollLeft <= 1) {
+        prevArrow.classList.add('hidden');
+      } else {
+        prevArrow.classList.remove('hidden');
+      }
+
+      // Hide next arrow if at the end
+      if (scrollLeft >= maxScroll - 1) {
+        nextArrow.classList.add('hidden');
+      } else {
+        nextArrow.classList.remove('hidden');
+      }
+    }
+
+    // Arrow Navigation
+    if (prevArrow && nextArrow) {
+      prevArrow.addEventListener('click', () => {
+        const itemWidth = videoItems[0].getBoundingClientRect().width;
+        const gap = 10; // CSS gap
+        slider.scrollBy({ left: -(itemWidth + gap), behavior: 'smooth' });
+      });
+
+      nextArrow.addEventListener('click', () => {
+        const itemWidth = videoItems[0].getBoundingClientRect().width;
+        const gap = 10; // CSS gap
+        slider.scrollBy({ left: itemWidth + gap, behavior: 'smooth' });
+      });
+    }
+
+    // Create dots
+    function createDots() {
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      for (let i = 0; i < totalItems; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('video-dot');
+        dot.setAttribute('aria-label', 'Go to video ' + (i + 1));
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update dots based on current position
+    function updateDots() {
+      if (!dotsContainer) return;
+      const dots = dotsContainer.querySelectorAll('.video-dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
+    }
+
+    // Go to specific slide
+    function goToSlide(slideIndex) {
+      currentIndex = slideIndex;
+      const videoItem = videoItems[slideIndex];
+      if (videoItem) {
+        videoItem.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      }
+      updateDots();
+    }
+
+    // Handle scroll event to update dots
+    let scrollTimeout;
+    slider.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      updateArrowVisibility();
+      scrollTimeout = setTimeout(() => {
+        // Find which video is most visible
+        let maxVisibility = 0;
+        let mostVisibleIndex = 0;
+
+        videoItems.forEach((item, index) => {
+          const rect = item.getBoundingClientRect();
+          const sliderRect = slider.getBoundingClientRect();
+
+          // Calculate how much of the item is visible
+          const visibleWidth = Math.min(rect.right, sliderRect.right) - Math.max(rect.left, sliderRect.left);
+          const visibility = visibleWidth / rect.width;
+
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+            mostVisibleIndex = index;
+          }
+        });
+
+        currentIndex = mostVisibleIndex;
+        updateDots();
+
+        // Optional: Disable arrows if at ends (not critical for infinite feel loop or simple sliders)
+      }, 100);
+    });
+
+    // Video play/pause functionality
+    videoItems.forEach((item) => {
+      const video = item.querySelector('[data-video-element]');
+      const playButton = item.querySelector('[data-play-button]');
+
+      if (!video || !playButton) return;
+
+      // Click on video wrapper to play/pause
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleVideo(video, playButton);
+      });
+    });
+
+    function toggleVideo(video, playButton) {
+      if (video.paused) {
+        // Pause all other videos first
+        videoItems.forEach((item) => {
+          const otherVideo = item.querySelector('[data-video-element]');
+          const otherButton = item.querySelector('[data-play-button]');
+          if (otherVideo && otherVideo !== video && !otherVideo.paused) {
+            otherVideo.pause();
+            otherVideo.muted = true;
+            if (otherButton) {
+              otherButton.classList.remove('hidden');
+            }
+          }
+        });
+
+        // Play this video
+        video.muted = false;
+        video
+          .play()
+          .then(() => {
+            playButton.classList.add('hidden');
+          })
+          .catch((error) => {
+            console.error('Error playing video:', error);
+          });
+      } else {
+        // Pause this video
+        video.pause();
+        video.muted = true;
+        playButton.classList.remove('hidden');
+      }
+    }
+
+    // Pause video when it ends (optional, since loop is enabled)
+    videoItems.forEach((item) => {
+      const video = item.querySelector('[data-video-element]');
+      if (video) {
+        video.addEventListener('ended', () => {
+          const playButton = item.querySelector('[data-play-button]');
+          if (playButton) {
+            playButton.classList.remove('hidden');
+          }
+        });
+      }
+    });
+
+    // Initialize
+    createDots();
+    updateDots();
+    updateArrowVisibility();
+
+    // Pause all videos when page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        videoItems.forEach((item) => {
+          const video = item.querySelector('[data-video-element]');
+          const playButton = item.querySelector('[data-play-button]');
+          if (video && !video.paused) {
+            video.pause();
+            video.muted = true;
+            if (playButton) {
+              playButton.classList.remove('hidden');
+            }
+          }
+        });
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Video Testimonials",
+  "tag": "section",
+  "class": "video-testimonials-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "100,000+ Products Sold"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video File",
+          "info": "Upload a video file. Recommended ratio: 9:16 (vertical video)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Testimonials",
+      "settings": {
+        "title": "100,000+ Products Sold"
+      },
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

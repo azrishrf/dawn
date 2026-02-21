@@ -1,0 +1,541 @@
+{% comment %}
+  Quality & Certifications Section
+  Displays certifications grid and quality commitment points
+{% endcomment %}
+
+<style>
+  .quality-section {
+    width: 100%;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 32px 0;
+  }
+
+  .quality-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (min-width: 1024px) {
+    .quality-container {
+      padding: 0 48px;
+    }
+  }
+
+  /* Header */
+  .quality-header {
+    text-align: left;
+    margin: 0 auto 40px;
+  }
+
+  @media (min-width: 1024px) {
+    .quality-header {
+      text-align: center;
+    }
+  }
+
+  .quality-subtitle {
+    font-size: 14px;
+    font-weight: bold;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+    margin: 0 0 16px 0;
+  }
+
+  .quality-title {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin: 0 0 16px 0;
+  }
+
+  @media (min-width: 1024px) {
+    .quality-title {
+      font-size: 48px;
+      margin: auto;
+    }
+  }
+
+  .quality-description {
+    color: #374151;
+    line-height: 1.6;
+    max-width: 896px;
+    margin: 0 auto;
+  }
+
+  /* Certifications Grid - Mobile Slider */
+  .certifications-slider {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 -24px;
+    padding: 16px 0 16px 24px;
+  }
+
+  .certifications-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .certifications-slider-inner {
+    display: flex;
+    gap: 24px;
+    padding-right: 24px;
+  }
+
+  .certification-card-mobile {
+    flex-shrink: 0;
+    width: 85vw;
+    scroll-snap-align: center;
+    text-align: center;
+    padding: 32px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  /* Certifications Grid - Desktop */
+  .certifications-grid {
+    display: none;
+    margin-top: 20px;
+    margin-bottom: 64px;
+  }
+
+  @media (min-width: 768px) {
+    .certifications-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .certifications-slider,
+    .scroll-dots,
+    .quality-title[style*="center"] {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .certifications-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .certification-card {
+    text-align: center;
+    padding: 32px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  {% comment %} .certification-card:hover {
+    background-color: #111827;
+    color: #ffffff;
+    transform: scale(1.05);
+  } {% endcomment %}
+
+  .certification-icon-wrapper {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .certification-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  {% comment %} .certification-card:hover .certification-icon {
+    background-color: #ffffff;
+  } {% endcomment %}
+
+  .certification-icon-wrapper svg,
+  .certification-icon-wrapper img {
+    width: 60px;
+    height: 60px;
+    color: #000000;
+    transition: color 0.3s ease;
+  }
+
+  {% comment %} .certification-card:hover .certification-icon-wrapper svg,
+  .certification-card:hover .certification-icon-wrapper img {
+    color: #000000;
+  } {% endcomment %}
+
+  .certification-description {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+    transition: color 0.3s ease;
+  }
+
+  {% comment %} .certification-card:hover .certification-description {
+    color: #d1d5db;
+  } {% endcomment %}
+
+  /* Scroll Dots */
+  .scroll-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .scroll-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  {% comment %} .scroll-dot:hover {
+    background-color: #9ca3af;
+  } {% endcomment %}
+
+  .scroll-dot.active {
+    background-color: #000000;
+    transform: scale(1.2);
+  }
+
+  /* Quality Commitment */
+  .quality-commitment {
+    background-color: #f9fafb;
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid #e5e7eb;
+  }
+
+  @media (min-width: 1024px) {
+    .quality-commitment {
+      padding: 48px;
+    }
+  }
+
+  .quality-commitment-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 32px 0;
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .quality-commitment-title {
+      font-size: 30px;
+    }
+  }
+
+  .quality-points-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .quality-points-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .quality-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .quality-point-icon {
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .quality-point-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #16a34a;
+  }
+
+  .quality-point-text {
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<section class="quality-section">
+  <div class="quality-container">
+    <!-- Header -->
+    <div class="quality-header">
+      <h3 class="quality-subtitle">{{ section.settings.subtitle }}</h3>
+      <h2 class="quality-title">{{ section.settings.title }}</h2>
+      <div class="quality-description">{{ section.settings.description }}</div>
+    </div>
+
+    <!-- Certifications - Mobile Slider -->
+    <p class="quality-title" style="text-align: center;">OUR MISSIONS</p>
+    <div class="certifications-slider" id="certSlider-{{ section.id }}">
+      <div class="certifications-slider-inner">
+        {% for block in section.blocks %}
+          {% if block.type == 'certification' %}
+            <div class="certification-card-mobile">
+              <div class="certification-icon-wrapper">
+                <div>
+                  {% if block.settings.icon_image %}
+                    <img
+                      src="{{ block.settings.icon_image | img_url: '160x' }}"
+                      alt="{{ block.settings.title }}"
+                      width="80"
+                      height="80"
+                      style="width: 80px; height: 80px;"
+                    >
+                  {% else %}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="80"
+                      height="80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                  {% endif %}
+                </div>
+              </div>
+
+              <p class="certification-description">{{ block.settings.description }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Certifications - Desktop Grid -->
+    <div class="certifications-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'certification' %}
+          <div class="certification-card">
+            <div class="certification-icon-wrapper">
+              <div>
+                {% if block.settings.icon_image %}
+                  <img
+                    src="{{ block.settings.icon_image | img_url: '160x' }}"
+                    alt="{{ block.settings.title }}"
+                    width="80"
+                    height="80"
+                    style="width: 80px; height: 80px;"
+                  >
+                {% else %}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="80"
+                    height="80"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                {% endif %}
+              </div>
+            </div>
+
+            <p class="certification-description">{{ block.settings.description }}</p>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Scroll Dots -->
+    <div class="scroll-dots" id="scrollDots-{{ section.id }}"></div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    // Small delay to ensure section is fully rendered
+    setTimeout(function () {
+      const sectionId = '{{ section.id }}';
+      const slider = document.getElementById('certSlider-' + sectionId);
+      const dotsContainer = document.getElementById('scrollDots-' + sectionId);
+
+      console.log('Quality Certs - Section ID:', sectionId);
+      console.log('Quality Certs - Slider element:', slider);
+      console.log('Quality Certs - Dots container:', dotsContainer);
+
+      if (!slider || !dotsContainer) {
+        console.log('Quality Certs - Slider or dots container not found');
+        console.log('Looking for: certSlider-' + sectionId + ' and scrollDots-' + sectionId);
+        return;
+      }
+
+      const certCards = slider.querySelectorAll('.certification-card-mobile');
+      const certCount = certCards.length;
+
+      console.log('Quality Certs - Certification cards:', certCards);
+      console.log('Quality Certs - Card count:', certCount);
+
+      if (certCount === 0) {
+        console.log(
+          'Quality Certs - No certification cards found. Please add certification blocks in the theme customizer.'
+        );
+        return;
+      }
+
+      console.log('Quality Certs - Found ' + certCount + ' cards, creating dots');
+
+      // Create dots
+      for (let i = 0; i < certCount; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'scroll-dot';
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        if (i === 0) dot.classList.add('active');
+
+        // Add click event to scroll to slide
+        dot.addEventListener('click', function () {
+          const cardWidth = slider.offsetWidth * 0.85 + 24; // 85vw + gap
+          slider.scrollTo({
+            left: cardWidth * i,
+            behavior: 'smooth',
+          });
+        });
+
+        dotsContainer.appendChild(dot);
+      }
+
+      const dots = dotsContainer.querySelectorAll('.scroll-dot');
+      console.log('Quality Certs - Created ' + dots.length + ' dots');
+
+      // Update active dot on scroll
+      slider.addEventListener('scroll', function () {
+        const scrollLeft = slider.scrollLeft;
+        const cardWidth = slider.offsetWidth * 0.85 + 24; // 85vw + gap
+        const index = Math.round(scrollLeft / cardWidth);
+
+        dots.forEach((dot, i) => {
+          if (i === index) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      });
+    }, 100);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Quality & Certifications",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "OUR MISSIONS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "CERTIFIED EXCELLENCE IN EVERY BATCH"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Our commitment to quality is backed by internationally recognized certifications and rigorous standards that ensure every product meets the highest benchmarks.</p>"
+    },
+    {
+      "type": "text",
+      "id": "commitment_title",
+      "label": "Quality Commitment Title",
+      "default": "OUR QUALITY COMMITMENT"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "certification",
+      "name": "Certification",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "International food safety management system certification"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon Image (Optional)",
+          "info": "Upload a custom icon. If not provided, a default shield icon will be used."
+        }
+      ]
+    },
+    {
+      "type": "quality_point",
+      "name": "Quality Point",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Point Text",
+          "default": "Premium ingredients sourced from trusted suppliers"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quality & Certifications",
+      "blocks": [
+        {
+          "type": "certification",
+          "settings": {
+            "description": "International food safety management system certification"
+          }
+        },
+        {
+          "type": "certification",
+          "settings": {
+            "description": "Hazard Analysis and Critical Control Points certification"
+          }
+        },
+        {
+          "type": "certification",
+          "settings": {
+            "description": "Certified halal by recognized Islamic authorities"
+          }
+        },
+        {
+          "type": "certification",
+          "settings": {
+            "description": "Good Manufacturing Practice standards compliance"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

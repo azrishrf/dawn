@@ -1,0 +1,1687 @@
+<!-- Product Seasonings Section (Gallery + Info) -->
+{% assign current_variant = product.selected_or_first_available_variant %}
+
+<div class="product-main-section">
+  <div class="product-main-container">
+    <div class="product-main-content">
+      <!-- Product Gallery -->
+      <div class="product-gallery">
+        <div class="gallery-sticky-container">
+          <!-- Mobile/Tablet View - Swipeable -->
+          <div class="gallery-mobile">
+            <div class="gallery-mobile-wrapper">
+              <!-- Swipeable Container -->
+              <div class="gallery-scroll" data-gallery-scroll>
+                <div class="gallery-images-wrapper">
+                  {% for image in product.images %}
+                    <div class="gallery-image-item">
+                      <img
+                        src="{{ image | img_url: '800x' }}"
+                        alt="{{ product.title }} - {{ forloop.index }}"
+                        width="800"
+                        height="1067"
+                        class="gallery-image"
+                        loading="lazy"
+                      >
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Pagination Dots -->
+              <div class="gallery-dots" data-gallery-dots>
+                {% for image in product.images %}
+                  <button
+                    data-dot-index="{{ forloop.index0 }}"
+                    class="gallery-dot"
+                    aria-label="View image {{ forloop.index }}"
+                  ></button>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop View - Thumbnails on Left -->
+          <div class="gallery-desktop">
+            <!-- Thumbnails - Left Side -->
+            <div class="gallery-thumbnails">
+              {% for image in product.images %}
+                <button
+                  data-thumbnail="{{ forloop.index0 }}"
+                  class="gallery-thumbnail"
+                >
+                  <img
+                    src="{{ image | img_url: '200x' }}"
+                    alt=""
+                    width="200"
+                    height="240"
+                    class="thumbnail-image"
+                    loading="lazy"
+                  >
+                </button>
+              {% endfor %}
+            </div>
+
+            <!-- Main Image - Right Side -->
+            <div class="gallery-main-image-container">
+              <img
+                data-main-image
+                src="{{ product.featured_image | img_url: '1200x' }}"
+                alt="{{ product.title }}"
+                width="1200"
+                height="1500"
+                class="gallery-main-image"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <h1 class="product-title">{{ product.title }}</h1>
+        {% if product.metafields.custom.subtitle %}
+          <p class="product-subtitle">{{ product.metafields.custom.subtitle }}</p>
+        {% endif %}
+
+        <!-- Price -->
+        <div class="product-price">
+          <span data-product-price>RM {{ current_variant.price | money_without_currency }}</span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="price-compare" data-compare-price
+              >RM {{ current_variant.compare_at_price | money_without_currency -}}
+            </span>
+          {% endif %}
+        </div>
+
+        {% comment %} <hr class="product-divider"> {% endcomment %}
+
+        <!-- Product Form -->
+        {% form 'product', product, id: 'product-form', data-product-form: '' %}
+          <!-- Pack Selection -->
+          <div class="pack-selection-container">
+            <div class="pack-options-grid">
+              {% assign single_variant = null %}
+              {% assign all_flavours_variant = null %}
+
+              {% comment %} Find the first single variant and the All Flavours Set variant {% endcomment %}
+              {% for variant in product.variants %}
+                {% assign variant_title_lower = variant.title | downcase %}
+                {% if single_variant == null and variant_title_lower != 'all flavours set' %}
+                  {% assign single_variant = variant %}
+                {% elsif variant_title_lower == 'all flavours set' %}
+                  {% assign all_flavours_variant = variant %}
+                {% endif %}
+              {% endfor %}
+
+              <!-- Single -->
+              {% assign single_image_idx = section.settings.single_image_index | minus: 1 %}
+              <div class="pack-option-card" data-pack-card data-pack-type="single">
+                <div class="pack-label">Single</div>
+                <div class="pack-image-wrapper">
+                  {% if product.images[single_image_idx] %}
+                    <img
+                      src="{{ product.images[single_image_idx] | img_url: '400x' }}"
+                      alt="Single"
+                      width="400"
+                      height="400"
+                      class="pack-image"
+                    >
+                  {% elsif product.images[0] %}
+                    <img
+                      src="{{ product.images[0] | img_url: '400x' }}"
+                      alt="Single"
+                      width="400"
+                      height="400"
+                      class="pack-image"
+                    >
+                  {% endif %}
+                </div>
+                <div class="pack-info">
+                  {% if single_variant %}
+                    <div class="pack-price">RM {{ single_variant.price | money_without_currency }}</div>
+                  {% else %}
+                    <div class="pack-price">RM 21.90</div>
+                  {% endif %}
+                  {% comment %} <div class="pack-freebie">-</div> {% endcomment %}
+                </div>
+              </div>
+
+              <!-- All Flavours Set -->
+              {% assign all_flavours_image_idx = section.settings.all_flavours_image_index | minus: 1 %}
+              <div class="pack-option-card pack-best-value" data-pack-card data-pack-type="all-flavours">
+                <div class="pack-badge pack-badge-dark">BEST VALUE</div>
+                <div class="pack-label">All Flavours</div>
+                <div class="pack-image-wrapper">
+                  {% if product.images[all_flavours_image_idx] %}
+                    <img
+                      src="{{ product.images[all_flavours_image_idx] | img_url: '400x' }}"
+                      alt="All Flavours"
+                      width="400"
+                      height="400"
+                      class="pack-image"
+                    >
+                  {% elsif product.images[0] %}
+                    <img
+                      src="{{ product.images[0] | img_url: '400x' }}"
+                      alt="All Flavours"
+                      width="400"
+                      height="400"
+                      class="pack-image"
+                    >
+                  {% endif %}
+                </div>
+                <div class="pack-info">
+                  {% if all_flavours_variant %}
+                    <div class="pack-price">RM {{ all_flavours_variant.price | money_without_currency }}</div>
+                  {% else %}
+                    <div class="pack-price">RM 21.90</div>
+                  {% endif %}
+                  <div class="pack-freebie">FREE ONTHEGO BAG</div>
+                  <div class="pack-save">SAVE RM10</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Flavor Selection (conditionally shown) -->
+            <div class="flavor-selection-container" data-flavor-container style="display: none;">
+              <label class="flavor-label">
+                FLAVOR: <span class="flavor-name-display" data-flavor-display>Please select a flavor</span>
+              </label>
+              <div class="flavor-grid">
+                {% for variant in product.variants %}
+                  {% assign variant_title_lower = variant.title | downcase %}
+                  {% if variant_title_lower != 'all flavours set' %}
+                    <button
+                      type="button"
+                      data-flavor-button
+                      data-variant-id="{{ variant.id }}"
+                      data-variant-name="{{ variant.title }}"
+                      data-variant-price="{{ variant.price }}"
+                      data-variant-compare-price="{{ variant.compare_at_price }}"
+                      data-variant-available="{{ variant.available }}"
+                      data-flavor-name="{{ variant.title }}"
+                      {% if variant.featured_image %}
+                        data-variant-image="{{ variant.featured_image | img_url: '1200x' }}"
+                      {% endif %}
+                      class="flavor-button {% if variant.available %}flavor-available{% else %}flavor-unavailable{% endif %}"
+                      {% unless variant.available %}
+                        disabled
+                      {% endunless %}
+                    >
+                      {{ variant.title }}
+                      {% unless variant.available %}(Sold Out){% endunless %}
+                    </button>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden variant input -->
+          <input type="hidden" name="id" data-variant-id-input value="{{ current_variant.id }}">
+
+          <!-- Quantity & Add to Cart -->
+          <div class="cart-controls">
+            <div class="quantity-selector">
+              <button
+                type="button"
+                data-quantity-minus
+                class="quantity-button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+              <input
+                type="text"
+                name="quantity"
+                value="1"
+                data-quantity-input
+                readonly
+                class="quantity-input"
+              >
+              <button
+                type="button"
+                data-quantity-plus
+                class="quantity-button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+            </div>
+            <button
+              type="submit"
+              data-add-to-cart
+              class="add-to-cart-button"
+              {% unless current_variant.available %}
+                disabled
+              {% endunless %}
+            >
+              <span class="btn-text">
+                {%- if current_variant.available %}ADD TO CART{% else %}SOLD OUT{% endif -%}
+              </span>
+              <span class="loading-spinner" style="display: none;">
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  class="spinner"
+                  viewBox="0 0 66 66"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                </svg>
+              </span>
+            </button>
+          </div>
+        {% endform %}
+
+        <!-- Description -->
+        <div class="product-description">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer-overlay" id="cartDrawer">
+  <div class="cart-drawer-backdrop" onclick="closeCartDrawer()"></div>
+  <div class="cart-drawer">
+    <div class="cart-drawer-header">
+      <h2 class="cart-drawer-title">YOUR CART</h2>
+      <button onclick="closeCartDrawer()" class="cart-drawer-close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="cart-drawer-items" id="cartDrawerItems">
+      <!-- Cart items will be dynamically inserted here -->
+    </div>
+    <div class="cart-drawer-footer">
+      <div class="cart-drawer-total">
+        <span>SUBTOTAL:</span>
+        <span id="cartDrawerTotal">RM 0.00</span>
+      </div>
+      <a href="/cart" class="cart-drawer-button cart-drawer-view">VIEW CART</a>
+      <a href="/checkout" class="cart-drawer-button cart-drawer-checkout">CHECKOUT</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-main-section {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .product-main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px 0;
+  }
+
+  @media (min-width: 1024px) {
+    .product-main-container {
+      padding-left: 30px;
+      padding-right: 30px;
+      padding-bottom: 40px
+    }
+  }
+
+  .product-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    .product-main-content {
+      flex-direction: row;
+      gap: 50px;
+    }
+  }
+
+  /* Gallery Styles */
+  .product-gallery {
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .product-gallery {
+      width: 50%;
+    }
+  }
+
+  .gallery-sticky-container {
+    position: sticky;
+    top: 16px;
+  }
+
+  /* Mobile View */
+  .gallery-mobile {
+    display: block;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery-mobile {
+      display: none;
+    }
+  }
+
+  .gallery-mobile-wrapper {
+    position: relative;
+  }
+
+  .gallery-scroll {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 -16px;
+  }
+
+  .gallery-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .gallery-images-wrapper {
+    display: flex;
+    gap: 4px;
+    padding: 0;
+  }
+
+  .gallery-images-wrapper::before,
+  .gallery-images-wrapper::after {
+    content: '';
+    width: calc((100% - 75%) / 2);
+    flex-shrink: 0;
+  }
+
+  .gallery-image-item {
+    width: 75%;
+    flex-shrink: 0;
+    background-color: #f9fafb;
+    scroll-snap-align: center;
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    max-width: 400px;
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .gallery-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+  }
+
+  .gallery-dot.active {
+    background-color: #000;
+  }
+
+  /* Desktop View */
+  .gallery-desktop {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery-desktop {
+      display: flex;
+      gap: 16px;
+    }
+  }
+
+  .gallery-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    {% comment %} max-height: 600px; {% endcomment %}
+  }
+
+  .gallery-thumbnails::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-thumbnail {
+    width: 80px;
+    height: 96px;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.3s ease;
+  }
+
+  .gallery-thumbnail:hover {
+    border-color: #d1d5db;
+  }
+
+  .gallery-thumbnail.active {
+    border-color: #000;
+  }
+
+  .thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-main-image-container {
+    flex: 1;
+    aspect-ratio: 4/5;
+    background-color: #f9fafb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+  }
+
+  /* Product Info Styles */
+  .product-info {
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .product-info {
+      width: 50%;
+    }
+  }
+
+  .product-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 0.025em;
+    line-height: 26px;
+  }
+
+  @media (min-width: 1024px) {
+    .product-title {
+      font-size: 20px;
+      margin-top: 0;
+      {% comment %} margin-bottom: 10px; {% endcomment %}
+      {% comment %} line-height: 30px; {% endcomment %}
+    }
+  }
+
+  .product-subtitle {
+    color: #4b5563;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .product-price {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .price-compare {
+    font-size: 18px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-weight: normal;
+  }
+
+  .product-divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin-bottom: 32px;
+  }
+
+  /* Pack Selection Styles */
+  .pack-selection-container {
+    margin-bottom: 26px;
+  }
+
+  .pack-options-grid {
+    display: flex;
+    {% comment %} grid-template-columns: repeat(3, 1fr); {% endcomment %}
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .pack-option-card {
+    position: relative;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px 8px 12px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f0f0f0;
+    max-width: 140px;
+  }
+
+  .pack-option-card:hover {
+    border-color: #000;
+  }
+
+  .pack-option-card.active {
+    border-color: #000;
+    border-width: 2px;
+  }
+
+  .pack-badge {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #cf2317;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    {% comment %} z-index: 10; {% endcomment %}
+    white-space: nowrap;
+  }
+
+  .pack-badge-dark {
+    background-color: #000;
+  }
+
+  .pack-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    text-align: center;
+    margin-bottom: 0;
+  }
+
+  .pack-image-wrapper {
+    width: 70%;
+    aspect-ratio: 810 / 870;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 6px auto 0 auto;
+    {% comment %} margin-top: 6px; {% endcomment %}
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: 120px;
+  }
+
+  .pack-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 1024px) {
+    .pack-image-wrapper {
+      width: 80%;
+      margin: auto;
+    }
+  }
+
+  .pack-info {
+    text-align: center;
+  }
+
+  .pack-price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 0;
+  }
+
+  .pack-freebie {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 500;
+    line-height: 12px;
+  }
+
+  .pack-save {
+    margin-top: 4px;
+    font-size: 11px;
+    color: red;
+    font-weight: 500;
+    line-height: 12px;
+  }
+
+  /* Flavor Selection Styles */
+  .flavor-selection-container {
+    margin-top: 16px;
+    {% comment %} padding-top: 16px; {% endcomment %}
+    {% comment %} border-top: 1px solid #e5e7eb; {% endcomment %}
+  }
+
+  .flavor-label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .flavor-name-display {
+    color: #6b7280;
+    font-weight: normal;
+  }
+
+  .flavor-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .flavor-button {
+    padding: 12px 16px;
+    font-family: var(--font-body-family);
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid;
+    background: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    border-radius: 4px;
+  }
+
+  .flavor-available {
+    border-color: #e5e7eb;
+    background-color: #fff;
+    color: #000;
+  }
+
+  .flavor-available:hover {
+    border-color: #000;
+  }
+
+  .flavor-button.active {
+    border-color: #cf2317;
+    background-color: #cf2317;
+    color: white;
+  }
+
+  .flavor-unavailable {
+    border-color: #f3f4f6;
+    background-color: #f9fafb;
+    color: #d1d5db;
+    cursor: not-allowed;
+  }
+
+  .cart-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    height: 48px;
+  }
+
+  .quantity-selector {
+    display: flex;
+    border: 1px solid #d1d5db;
+    width: 128px;
+    align-items: center;
+  }
+
+  .quantity-button {
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Funnel Display', sans-serif;
+    color: black;
+  }
+
+  .quantity-button:hover {
+    background-color: #f3f4f6;
+  }
+
+  .quantity-input {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    outline: none;
+    font-weight: bold;
+    border: none;
+  }
+
+  .add-to-cart-button {
+    flex: 1;
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Funnel Display', sans-serif;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .add-to-cart-button:hover {
+    background-color: #1f2937;
+  }
+
+  .add-to-cart-button:disabled {
+    background-color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  /* Spinner Styles */
+  .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+  }
+
+  .spinner {
+    animation: rotator 1.4s linear infinite;
+  }
+
+  @keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+  }
+
+  .path {
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    stroke: #ffffff;
+    animation: dash 1.4s ease-in-out infinite;
+  }
+
+  @keyframes dash {
+    0% { stroke-dashoffset: 280; }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 280;
+      transform: rotate(450deg);
+    }
+  }
+
+  .product-description {
+    margin-bottom: 32px;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .product-description li p {
+    margin: 4px 0;
+  }
+
+  .product-description ul {
+    padding-left: 20px;
+  }
+
+  /* Cart Drawer Styles */
+  .cart-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .cart-drawer-overlay.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .cart-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .cart-drawer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    max-width: 90vw;
+    background-color: #fff;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .cart-drawer-overlay.active .cart-drawer {
+    transform: translateX(0);
+  }
+
+  .cart-drawer-header {
+    padding: 10px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, #f9fafb, #fff);
+  }
+
+  .cart-drawer-title {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin: 0;
+  }
+
+  .cart-drawer-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    color: black;
+  }
+
+  .cart-drawer-close:hover {
+    background-color: #f3f4f6;
+  }
+
+  .cart-drawer-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .cart-drawer-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .cart-drawer-item:last-child {
+    border-bottom: none;
+  }
+
+  .cart-item-image {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    background-color: #f9fafb;
+    flex-shrink: 0;
+  }
+
+  .cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cart-item-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .cart-item-variant {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .cart-item-quantity {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .cart-item-price {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .cart-drawer-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: #6b7280;
+  }
+
+  .cart-drawer-footer {
+    padding: 24px;
+    border-top: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+  }
+
+  .cart-drawer-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  .cart-drawer-button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+  }
+
+  .cart-drawer-button:last-child {
+    margin-bottom: 0;
+  }
+
+  .cart-drawer-view {
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+
+  .cart-drawer-view:hover {
+    background-color: #f3f4f6;
+  }
+
+  .cart-drawer-checkout {
+    background-color: #000;
+    color: #fff;
+  }
+
+  .cart-drawer-checkout:hover {
+    background-color: #1f2937;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Mobile gallery scroll handling
+    const scrollContainer = document.querySelector('[data-gallery-scroll]');
+    const dots = document.querySelectorAll('[data-dot-index]');
+
+    if (scrollContainer && dots.length > 0) {
+      let currentIndex = 0;
+
+      // Update dots on scroll
+      scrollContainer.addEventListener('scroll', function () {
+        const scrollLeft = scrollContainer.scrollLeft;
+        const firstItem = scrollContainer.querySelector('.gallery-image-item');
+
+        if (firstItem) {
+          const itemWidth = firstItem.offsetWidth;
+          const gap = 4;
+          const stride = itemWidth + gap;
+          const newIndex = Math.round(scrollLeft / stride);
+
+          if (newIndex !== currentIndex && newIndex >= 0 && newIndex < dots.length) {
+            currentIndex = newIndex;
+            updateDots(newIndex);
+          }
+        }
+      });
+
+      // Click on dots
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', function () {
+          const firstItem = scrollContainer.querySelector('.gallery-image-item');
+          if (firstItem) {
+            const gap = 4;
+            const stride = firstItem.offsetWidth + gap;
+            scrollContainer.scrollTo({
+              left: stride * index,
+              behavior: 'smooth',
+            });
+            currentIndex = index;
+            updateDots(index);
+          }
+        });
+      });
+
+      function updateDots(index) {
+        dots.forEach((dot, i) => {
+          if (i === index) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      // Initialize first dot as active
+      updateDots(0);
+    }
+
+    // Desktop thumbnail click handling
+    const thumbnails = document.querySelectorAll('[data-thumbnail]');
+    const mainImage = document.querySelector('[data-main-image]');
+
+    if (thumbnails.length > 0 && mainImage) {
+      thumbnails.forEach((thumbnail, index) => {
+        thumbnail.addEventListener('click', function () {
+          const imageUrl = this.querySelector('img').src.replace('200x', '1200x');
+          mainImage.src = imageUrl;
+
+          // Update active thumbnail
+          thumbnails.forEach((t) => t.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Set first thumbnail as active
+      if (thumbnails[0]) {
+        thumbnails[0].classList.add('active');
+      }
+    }
+
+    // Product Info JavaScript
+    const form = document.querySelector('[data-product-form]');
+    if (!form) return;
+
+    // Pack and Flavor Selection
+    const packCards = document.querySelectorAll('[data-pack-card]');
+    const flavorContainer = document.querySelector('[data-flavor-container]');
+    const flavorButtons = document.querySelectorAll('[data-flavor-button]');
+    const flavorDisplay = document.querySelector('[data-flavor-display]');
+    const variantInput = document.querySelector('[data-variant-id-input]');
+    const priceDisplay = document.querySelector('[data-product-price]');
+    const addToCartButton = document.querySelector('[data-add-to-cart]');
+
+    let selectedPackType = 'single'; // Default to single pack
+    let selectedFlavor = null;
+
+    // Pack card click handling
+    packCards.forEach((card) => {
+      card.addEventListener('click', function () {
+        const packType = this.dataset.packType;
+        
+        // Update active state
+        packCards.forEach((c) => c.classList.remove('active'));
+        this.classList.add('active');
+        
+        selectedPackType = packType;
+        selectedFlavor = null; // Reset flavor selection
+        
+        // Show/hide flavor selection based on pack type
+        if (packType === 'single') {
+          flavorContainer.style.display = 'block';
+          
+          // Reset flavor display
+          if (flavorDisplay) {
+            flavorDisplay.textContent = 'Please select a flavor';
+          }
+          
+          // Reset all flavor buttons
+          flavorButtons.forEach((btn) => {
+            btn.classList.remove('active');
+          });
+          
+          // Update price to show the first available single variant price
+          const allVariants = {{ product.variants | json }};
+          const firstSingleVariant = allVariants.find(v => {
+            const title = v.title.toLowerCase();
+            return title !== 'all flavours set' && v.available;
+          });
+          
+          if (firstSingleVariant && priceDisplay) {
+            const price = parseFloat(firstSingleVariant.price) / 100;
+            priceDisplay.textContent = 'RM ' + price.toFixed(2);
+            
+            // Update compare at price if it exists
+            const comparePrice = firstSingleVariant.compare_at_price;
+            const comparePriceDisplay = document.querySelector('[data-compare-price]');
+            if (comparePriceDisplay) {
+              if (comparePrice && parseFloat(comparePrice) > parseFloat(firstSingleVariant.price)) {
+                const compareAmount = parseFloat(comparePrice) / 100;
+                comparePriceDisplay.textContent = 'RM ' + compareAmount.toFixed(2);
+                comparePriceDisplay.style.display = '';
+              } else {
+                comparePriceDisplay.style.display = 'none';
+              }
+            }
+          }
+          
+          // Disable add to cart until flavor is selected
+          if (addToCartButton) {
+            const btnText = addToCartButton.querySelector('.btn-text');
+            addToCartButton.disabled = true;
+            if (btnText) btnText.textContent = 'SELECT A FLAVOR';
+          }
+        } else if (packType === 'all-flavours') {
+          // All Flavours - hide flavor selection
+          flavorContainer.style.display = 'none';
+          
+          // Find the All Flavours Set variant
+          const allVariants = {{ product.variants | json }};
+          const allFlavoursVariant = allVariants.find(v => {
+            const title = v.title.toLowerCase();
+            return title === 'all flavours set';
+          });
+          
+          if (allFlavoursVariant && variantInput) {
+            variantInput.value = allFlavoursVariant.id;
+            
+            // Update price display
+            if (priceDisplay) {
+              const price = parseFloat(allFlavoursVariant.price) / 100;
+              priceDisplay.textContent = 'RM ' + price.toFixed(2);
+            }
+            
+            // Update compare at price if it exists
+            const comparePrice = allFlavoursVariant.compare_at_price;
+            const comparePriceDisplay = document.querySelector('[data-compare-price]');
+            if (comparePriceDisplay) {
+              if (comparePrice && parseFloat(comparePrice) > parseFloat(allFlavoursVariant.price)) {
+                const compareAmount = parseFloat(comparePrice) / 100;
+                comparePriceDisplay.textContent = 'RM ' + compareAmount.toFixed(2);
+                comparePriceDisplay.style.display = '';
+              } else {
+                comparePriceDisplay.style.display = 'none';
+              }
+            }
+            
+            // Update images - use the configured all_flavours_image_index
+            const allFlavoursImageIndex = {{ section.settings.all_flavours_image_index | minus: 1 }};
+            const productImages = {{ product.images | json }};
+            
+            if (productImages[allFlavoursImageIndex]) {
+              const selectedImage = productImages[allFlavoursImageIndex];
+              
+              // Update desktop main image
+              const mainImage = document.querySelector('[data-main-image]');
+              if (mainImage) {
+                // Construct proper Shopify image URL with size
+                let imageUrl = selectedImage;
+                if (typeof selectedImage === 'string') {
+                  imageUrl = selectedImage.replace(/(\.[^.?]+)(\?.*)?$/, '_1200x$1$2');
+                }
+                mainImage.src = imageUrl;
+              }
+
+              // Update mobile gallery - scroll to the matching image
+              const scrollContainer = document.querySelector('[data-gallery-scroll]');
+              if (scrollContainer) {
+                const firstItem = scrollContainer.querySelector('.gallery-image-item');
+                if (firstItem) {
+                  const gap = 4;
+                  const stride = firstItem.offsetWidth + gap;
+                  scrollContainer.scrollTo({
+                    left: stride * allFlavoursImageIndex,
+                    behavior: 'smooth'
+                  });
+                  
+                  const dots = document.querySelectorAll('[data-dot-index]');
+                  dots.forEach((dot, i) => {
+                    if (i === allFlavoursImageIndex) {
+                      dot.classList.add('active');
+                    } else {
+                      dot.classList.remove('active');
+                    }
+                  });
+                }
+              }
+              
+              // Update desktop thumbnails
+              const thumbnails = document.querySelectorAll('[data-thumbnail]');
+              if (thumbnails.length > 0 && thumbnails[allFlavoursImageIndex]) {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumbnails[allFlavoursImageIndex].classList.add('active');
+              }
+            }
+            
+            // Enable the button if available
+            if (addToCartButton) {
+              const btnText = addToCartButton.querySelector('.btn-text');
+              if (allFlavoursVariant.available) {
+                addToCartButton.disabled = false;
+                if (btnText) btnText.textContent = 'ADD TO CART';
+              } else {
+                addToCartButton.disabled = true;
+                if (btnText) btnText.textContent = 'SOLD OUT';
+              }
+            }
+          }
+        }
+      });
+    });
+
+    // Flavor button click handling
+    flavorButtons.forEach((button) => {
+      button.addEventListener('click', function () {
+        if (this.dataset.variantAvailable === 'false') return;
+        
+        // Update active state for flavors
+        flavorButtons.forEach((btn) => {
+          btn.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        selectedFlavor = this.dataset.flavorName;
+        
+        // Update flavor display
+        if (flavorDisplay) {
+          flavorDisplay.textContent = selectedFlavor;
+        }
+        
+        // Update variant
+        updateVariant(this);
+      });
+    });
+
+    // Function to update variant information
+    function updateVariant(button) {
+      const variantId = button.dataset.variantId;
+      const variantName = button.dataset.variantName;
+      const variantPrice = button.dataset.variantPrice;
+      const isAvailable = button.dataset.variantAvailable === 'true';
+
+      variantInput.value = variantId;
+      
+      if (priceDisplay) {
+        const price = parseFloat(variantPrice) / 100;
+        priceDisplay.textContent = 'RM ' + price.toFixed(2);
+      }
+      
+      // Update compare at price if it exists
+      const comparePrice = button.dataset.variantComparePrice;
+      const comparePriceDisplay = document.querySelector('[data-compare-price]');
+      if (comparePriceDisplay) {
+        if (comparePrice && parseFloat(comparePrice) > parseFloat(variantPrice)) {
+          const compareAmount = parseFloat(comparePrice) / 100;
+          comparePriceDisplay.textContent = 'RM ' + compareAmount.toFixed(2);
+          comparePriceDisplay.style.display = '';
+        } else {
+          comparePriceDisplay.style.display = 'none';
+        }
+      }
+
+      // Update button state
+      if (addToCartButton) {
+        const btnText = addToCartButton.querySelector('.btn-text');
+        if (isAvailable) {
+          addToCartButton.disabled = false;
+          if (btnText) btnText.textContent = 'ADD TO CART';
+        } else {
+          addToCartButton.disabled = true;
+          if (btnText) btnText.textContent = 'SOLD OUT';
+        }
+      }
+
+      // Update images if variant has a featured image
+      const variantImage = button.dataset.variantImage;
+      if (variantImage) {
+        // Update desktop main image
+        const mainImage = document.querySelector('[data-main-image]');
+        if (mainImage) {
+          mainImage.src = variantImage;
+        }
+
+        // Update mobile gallery - find and scroll to matching image
+        const scrollContainer = document.querySelector('[data-gallery-scroll]');
+        if (scrollContainer) {
+          const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
+          let matchingIndex = 0;
+          
+          galleryImages.forEach((img, index) => {
+            const imgSrc = img.src.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
+            const variantSrc = variantImage.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
+            
+            if (imgSrc.includes(variantSrc.split('/').pop().split('_')[0])) {
+              matchingIndex = index;
+            }
+          });
+          
+          const firstItem = scrollContainer.querySelector('.gallery-image-item');
+          if (firstItem) {
+            const gap = 4;
+            const stride = firstItem.offsetWidth + gap;
+            scrollContainer.scrollTo({
+              left: stride * matchingIndex,
+              behavior: 'smooth'
+            });
+            
+            const dots = document.querySelectorAll('[data-dot-index]');
+            dots.forEach((dot, i) => {
+              if (i === matchingIndex) {
+                dot.classList.add('active');
+              } else {
+                dot.classList.remove('active');
+              }
+            });
+          }
+        }
+        
+        // Update desktop thumbnails
+        const thumbnails = document.querySelectorAll('[data-thumbnail]');
+        if (thumbnails.length > 0) {
+          thumbnails.forEach((thumb, index) => {
+            const thumbImg = thumb.querySelector('img');
+            const thumbSrc = thumbImg.src.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
+            const variantSrc = variantImage.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
+            
+            if (thumbSrc.includes(variantSrc.split('/').pop().split('_')[0])) {
+              thumbnails.forEach(t => t.classList.remove('active'));
+              thumb.classList.add('active');
+            }
+          });
+        }
+      }
+
+      // Trigger gallery update if needed
+      const event = new CustomEvent('variant:changed', { detail: { variantId: variantId } });
+      document.dispatchEvent(event);
+    }
+
+    // Check if variant ID is in URL and auto-select
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlVariantId = urlParams.get('variant');
+    let variantAutoSelected = false;
+    
+    if (urlVariantId) {
+      // Check if it's the All Flavours Set variant
+      const allVariants = {{ product.variants | json }};
+      const urlVariant = allVariants.find(v => v.id.toString() === urlVariantId);
+      
+      if (urlVariant) {
+        const variantTitleLower = urlVariant.title.toLowerCase();
+        
+        if (variantTitleLower === 'all flavours set') {
+          // Select All Flavours pack
+          packCards.forEach((c) => c.classList.remove('active'));
+          const allFlavoursCard = document.querySelector('[data-pack-card][data-pack-type="all-flavours"]');
+          if (allFlavoursCard) {
+            allFlavoursCard.classList.add('active');
+          }
+          
+          selectedPackType = 'all-flavours';
+          flavorContainer.style.display = 'none';
+          
+          // Set variant and update price
+          variantInput.value = urlVariant.id;
+          
+          if (priceDisplay) {
+            const price = parseFloat(urlVariant.price) / 100;
+            priceDisplay.textContent = 'RM ' + price.toFixed(2);
+          }
+          
+          const comparePrice = urlVariant.compare_at_price;
+          const comparePriceDisplay = document.querySelector('[data-compare-price]');
+          if (comparePriceDisplay) {
+            if (comparePrice && parseFloat(comparePrice) > parseFloat(urlVariant.price)) {
+              const compareAmount = parseFloat(comparePrice) / 100;
+              comparePriceDisplay.textContent = 'RM ' + compareAmount.toFixed(2);
+              comparePriceDisplay.style.display = '';
+            } else {
+              comparePriceDisplay.style.display = 'none';
+            }
+          }
+          
+          if (addToCartButton) {
+            const btnText = addToCartButton.querySelector('.btn-text');
+            if (urlVariant.available) {
+              addToCartButton.disabled = false;
+              if (btnText) btnText.textContent = 'ADD TO CART';
+            } else {
+              addToCartButton.disabled = true;
+              if (btnText) btnText.textContent = 'SOLD OUT';
+            }
+          }
+          
+          variantAutoSelected = true;
+        } else {
+          // It's a single flavor variant
+          // Find the flavor button with this variant ID
+          flavorButtons.forEach((btn) => {
+            if (btn.dataset.variantId === urlVariantId) {
+              // Select single pack
+              packCards.forEach((c) => c.classList.remove('active'));
+              const singleCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
+              if (singleCard) {
+                singleCard.classList.add('active');
+              }
+              
+              selectedPackType = 'single';
+              flavorContainer.style.display = 'block';
+              
+              // Select this flavor button
+              flavorButtons.forEach((flavorBtn) => {
+                flavorBtn.classList.remove('active');
+              });
+              btn.classList.add('active');
+              
+              selectedFlavor = btn.dataset.flavorName;
+              
+              if (flavorDisplay) {
+                flavorDisplay.textContent = selectedFlavor;
+              }
+              
+              // Update variant
+              updateVariant(btn);
+              variantAutoSelected = true;
+            }
+          });
+        }
+      }
+    }
+    
+    // Initialize: Select single pack by default if no variant was auto-selected
+    if (!variantAutoSelected) {
+      const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
+      if (singlePackCard) {
+        singlePackCard.classList.add('active');
+        selectedPackType = 'single';
+        
+        // Show flavor container
+        if (flavorContainer) {
+          flavorContainer.style.display = 'block';
+        }
+        
+        // Disable add to cart until flavor is selected
+        if (addToCartButton) {
+          const btnText = addToCartButton.querySelector('.btn-text');
+          addToCartButton.disabled = true;
+          if (btnText) btnText.textContent = 'SELECT A FLAVOR';
+        }
+      }
+    }
+
+    // Quantity Controls
+    const quantityInput = document.querySelector('[data-quantity-input]');
+    const minusButton = document.querySelector('[data-quantity-minus]');
+    const plusButton = document.querySelector('[data-quantity-plus]');
+
+    if (minusButton && quantityInput) {
+      minusButton.addEventListener('click', function () {
+        let currentQty = parseInt(quantityInput.value) || 1;
+        if (currentQty > 1) {
+          quantityInput.value = currentQty - 1;
+        }
+      });
+    }
+
+    if (plusButton && quantityInput) {
+      plusButton.addEventListener('click', function () {
+        let currentQty = parseInt(quantityInput.value) || 1;
+        quantityInput.value = currentQty + 1;
+      });
+    }
+
+    // Form submission
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const submitButton = form.querySelector('[data-add-to-cart]');
+      const btnText = submitButton ? submitButton.querySelector('.btn-text') : null;
+      const spinner = submitButton ? submitButton.querySelector('.loading-spinner') : null;
+
+      // Show loading state
+      if (submitButton) {
+        submitButton.disabled = true;
+        if (btnText) btnText.style.opacity = '0';
+        if (spinner) spinner.style.display = 'block';
+      }
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Trigger cart update event
+          const event = new CustomEvent('cart:updated', { detail: data });
+          document.dispatchEvent(event);
+
+          // Open cart drawer and update it
+          openCartDrawer();
+          updateCartDrawer();
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+      } finally {
+        // Reset loading state
+        if (submitButton) {
+          submitButton.disabled = false;
+          if (btnText) btnText.style.opacity = '1';
+          if (spinner) spinner.style.display = 'none';
+        }
+      }
+    });
+  });
+
+   // Cart Drawer Functions
+  function openCartDrawer() {
+    document.getElementById('cartDrawer').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeCartDrawer() {
+    document.getElementById('cartDrawer').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  async function updateCartDrawer() {
+    try {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+      
+      const itemsContainer = document.getElementById('cartDrawerItems');
+      const totalElement = document.getElementById('cartDrawerTotal');
+      
+      if (cart.items.length === 0) {
+        itemsContainer.innerHTML = '<div class="cart-drawer-empty">Your cart is empty</div>';
+      } else {
+        itemsContainer.innerHTML = cart.items.map(item => `
+          <div class="cart-drawer-item">
+            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+            <div class="cart-item-details">
+              <div class="cart-item-title">${item.product_title}</div>
+              ${item.variant_title ? `<div class="cart-item-variant">${item.variant_title}</div>` : ''}
+              <div class="cart-item-quantity">Qty: ${item.quantity}</div>
+              <div class="cart-item-price">RM ${(item.final_line_price / 100).toFixed(2)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      totalElement.textContent = `RM ${(cart.total_price / 100).toFixed(2)}`;
+      
+      // Update header cart count
+      const cartCountElement = document.getElementById('cartCount');
+      if (cartCountElement) {
+        cartCountElement.textContent = cart.item_count;
+      }
+    } catch (error) {
+      console.error('Error updating cart drawer:', error);
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Product Main Seasonings",
+  "tag": "section",
+  "class": "product-main-seasonings-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Pack Option Images"
+    },
+    {
+      "type": "range",
+      "id": "single_image_index",
+      "label": "Single Pack Image",
+      "info": "Select which product image to display for Single pack (1 = first image)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "all_flavours_image_index",
+      "label": "All Flavours Image",
+      "info": "Select which product image to display for All Flavours (1 = first image)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,555 @@
+{% comment %}
+  Community Section
+  Displays community images in a slider with title, description and Instagram button
+{% endcomment %}
+
+<style>
+  .community-section {
+    background-color: #ffffff;
+    position: relative;
+  }
+
+  .community-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .community-container {
+      padding: 40px 30px;
+    }
+  }
+
+  .community-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .community-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0;
+    letter-spacing: 0.025em;
+  }
+
+  @media (min-width: 768px) {
+    .community-title {
+      font-size: 28px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .community-title {
+      font-size: 36px;
+    }
+  }
+
+  .community-description {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #333333;
+    margin: 0 0 24px 0;
+  }
+
+  @media (min-width: 768px) {
+    .community-description {
+      font-size: 1.6rem;
+    }
+  }
+
+  .community-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 14px 32px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+  }
+
+  .community-button:hover {
+    background-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .community-button svg {
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
+  }
+
+  .community-slider-wrapper {
+    position: relative;
+    /* Ensure arrows can be positioned outside if needed, or inside */
+  }
+
+  .community-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 16px;
+  }
+
+  .community-slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .community-image-card {
+    flex: 0 0 160px;
+    scroll-snap-align: start;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    cursor: pointer;
+  }
+
+  @media (min-width: 768px) {
+    .community-image-card {
+      flex: 0 0 320px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .community-image-card {
+      /* Flexible sizing: min 260px, max 300px, fit as many as possible */
+      flex: 0 0 auto;
+      min-width: 260px;
+      max-width: 300px;
+      width: calc((100% - (var(--items-count, 4) * 16px)) / var(--items-count, 4));
+    }
+  }
+
+  .community-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  .community-image,
+  .community-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .community-play-button {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    z-index: 10;
+    padding: 0;
+  }
+
+  .community-play-button:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+  }
+
+  .community-play-button.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .community-play-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  /* Slider Navigation Arrows */
+  .community-slider-arrow {
+    display: none; /* Hidden on mobile by default */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s ease;
+  }
+
+  .community-slider-arrow:hover {
+    background-color: #f9fafb;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .community-slider-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .community-slider-arrow-left {
+    left: -20px;
+  }
+
+  .community-slider-arrow-right {
+    right: -20px;
+  }
+
+  .community-slider-arrow svg {
+    width: 20px;
+    height: 20px;
+    fill: #000000;
+  }
+
+  @media (min-width: 1024px) {
+    .community-slider-arrow {
+      display: flex;
+    }
+  }
+</style>
+
+<div class="community-section">
+  <div class="community-container">
+    <!-- Header, Description and Button -->
+    <div class="community-header">
+      <h2 class="community-title">{{ section.settings.title }}</h2>
+      <p class="community-description">{{ section.settings.description }}</p>
+      {% if section.settings.instagram_url != blank %}
+        <a
+          href="{{ section.settings.instagram_url }}"
+          class="community-button"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          {{ section.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Image Slider -->
+    <div class="community-slider-wrapper">
+      <button
+        class="community-slider-arrow community-slider-arrow-left"
+        id="community-prev-arrow-{{ section.id }}"
+        aria-label="Previous slide"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </button>
+
+      <div class="community-slider-container" id="community-slider-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'community_media' %}
+            <div class="community-image-card" data-community-item data-index="{{ forloop.index0 }}">
+              <div class="community-image-wrapper">
+                {% if block.settings.video != blank %}
+                  <video
+                    class="community-video"
+                    data-community-video
+                    loop
+                    playsinline
+                    muted
+                    preload="metadata"
+                    poster="{{ block.settings.video.preview_image | image_url: width: 400 }}"
+                  >
+                    {% for source in block.settings.video.sources %}
+                      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                    {% endfor %}
+                    Your browser does not support the video tag.
+                  </video>
+
+                  <button class="community-play-button" data-community-play-button aria-label="Play video">
+                    <svg class="community-play-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 5v14l11-7L8 5z" fill="#000000"/>
+                    </svg>
+                  </button>
+                {% elsif block.settings.image != blank %}
+                  {{
+                    block.settings.image
+                    | image_url: width: 800
+                    | image_tag: class: 'community-image', loading: 'lazy', alt: block.settings.image.alt
+                    | default: 'Community image'
+                  }}
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag: 'community-image' }}
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button
+        class="community-slider-arrow community-slider-arrow-right"
+        id="community-next-arrow-{{ section.id }}"
+        aria-label="Next slide"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('community-slider-' + sectionId);
+    const prevArrow = document.getElementById('community-prev-arrow-' + sectionId);
+    const nextArrow = document.getElementById('community-next-arrow-' + sectionId);
+
+    if (!slider) return;
+
+    const communityItems = slider.querySelectorAll('[data-community-item]');
+    const totalItems = communityItems.length;
+
+    let currentIndex = 0;
+
+    // Update arrow visibility based on scroll position
+    function updateArrowVisibility() {
+      if (!prevArrow || !nextArrow) return;
+
+      const scrollLeft = slider.scrollLeft;
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+      // Hide previous arrow if at the start
+      if (scrollLeft <= 1) {
+        prevArrow.classList.add('hidden');
+      } else {
+        prevArrow.classList.remove('hidden');
+      }
+
+      // Hide next arrow if at the end
+      if (scrollLeft >= maxScroll - 1) {
+        nextArrow.classList.add('hidden');
+      } else {
+        nextArrow.classList.remove('hidden');
+      }
+    }
+
+    // Arrow Navigation
+    if (prevArrow && nextArrow) {
+      prevArrow.addEventListener('click', () => {
+        const itemWidth = communityItems[0].getBoundingClientRect().width;
+        const gap = 16; // CSS gap
+        slider.scrollBy({ left: -(itemWidth + gap), behavior: 'smooth' });
+      });
+
+      nextArrow.addEventListener('click', () => {
+        const itemWidth = communityItems[0].getBoundingClientRect().width;
+        const gap = 16; // CSS gap
+        slider.scrollBy({ left: itemWidth + gap, behavior: 'smooth' });
+      });
+    }
+
+    // Handle scroll event
+    let scrollTimeout;
+    slider.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      updateArrowVisibility();
+      scrollTimeout = setTimeout(() => {
+        // Find which item is most visible
+        let maxVisibility = 0;
+        let mostVisibleIndex = 0;
+
+        communityItems.forEach((item, index) => {
+          const rect = item.getBoundingClientRect();
+          const sliderRect = slider.getBoundingClientRect();
+
+          // Calculate how much of the item is visible
+          const visibleWidth = Math.min(rect.right, sliderRect.right) - Math.max(rect.left, sliderRect.left);
+          const visibility = visibleWidth / rect.width;
+
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+            mostVisibleIndex = index;
+          }
+        });
+
+        currentIndex = mostVisibleIndex;
+      }, 100);
+    });
+
+    // Video play/pause functionality
+    communityItems.forEach((item) => {
+      const video = item.querySelector('[data-community-video]');
+      const playButton = item.querySelector('[data-community-play-button]');
+
+      if (!video || !playButton) return;
+
+      // Click on video wrapper to play/pause
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleVideo(video, playButton);
+      });
+    });
+
+    function toggleVideo(video, playButton) {
+      if (video.paused) {
+        // Pause all other videos first
+        communityItems.forEach((item) => {
+          const otherVideo = item.querySelector('[data-community-video]');
+          const otherButton = item.querySelector('[data-community-play-button]');
+          if (otherVideo && otherVideo !== video && !otherVideo.paused) {
+            otherVideo.pause();
+            otherVideo.muted = true;
+            if (otherButton) {
+              otherButton.classList.remove('hidden');
+            }
+          }
+        });
+
+        // Play this video
+        video.muted = false;
+        video
+          .play()
+          .then(() => {
+            playButton.classList.add('hidden');
+          })
+          .catch((error) => {
+            console.error('Error playing video:', error);
+          });
+      } else {
+        // Pause this video
+        video.pause();
+        video.muted = true;
+        playButton.classList.remove('hidden');
+      }
+    }
+
+    // Pause video when it ends (optional, since loop is enabled)
+    communityItems.forEach((item) => {
+      const video = item.querySelector('[data-community-video]');
+      if (video) {
+        video.addEventListener('ended', () => {
+          const playButton = item.querySelector('[data-community-play-button]');
+          if (playButton) {
+            playButton.classList.remove('hidden');
+          }
+        });
+      }
+    });
+
+    // Initialize
+    updateArrowVisibility();
+
+    // Pause all videos when page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        communityItems.forEach((item) => {
+          const video = item.querySelector('[data-community-video]');
+          const playButton = item.querySelector('[data-community-play-button]');
+          if (video && !video.paused) {
+            video.pause();
+            video.muted = true;
+            if (playButton) {
+              playButton.classList.remove('hidden');
+            }
+          }
+        });
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Community Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "JOIN OUR COMMUNITY"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section Description",
+      "default": "Join our vibrant community of fitness enthusiasts and athletes. Follow us on Instagram to stay updated with the latest products, tips, and inspiration."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "onthegomy"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL",
+      "info": "Enter your Instagram profile URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "community_media",
+      "name": "Community Media",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Upload a video (9:16 aspect ratio recommended). Video will auto-play, loop, and be muted."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (fallback)",
+          "info": "If no video is uploaded, this image will be shown. Recommended: 9:16 aspect ratio (e.g., 1080x1920px)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Community Section",
+      "blocks": [
+        {
+          "type": "community_media"
+        },
+        {
+          "type": "community_media"
+        },
+        {
+          "type": "community_media"
+        },
+        {
+          "type": "community_media"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

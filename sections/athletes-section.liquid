@@ -1,0 +1,599 @@
+{% comment %}
+  Athletes Section
+  Displays sponsored athletes in a slider with images and names
+{% endcomment %}
+
+<style>
+  .athletes-section {
+    background-color: #ffffff;
+    padding: 0;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+
+  .athletes-container {
+    {% comment %} max-width: 1400px; {% endcomment %}
+    margin: 0 auto;
+  }
+
+  .athletes-header {
+    text-align: center;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    padding: 0 16px 16px 16px;
+  }
+
+  .athletes-title {
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: 700;
+    font-size: 2.4rem;
+    color: #000000;
+    margin: 0 0 6px 0;
+    {% comment %} letter-spacing: 0.05em; {% endcomment %}
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .athletes-title {
+      font-size: 3.2rem;
+    }
+  }
+
+  .athletes-description {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #333333;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .athletes-description {
+      font-size: 1.6rem;
+    }
+  }
+
+  /* Slider Wrapper */
+  .athletes-slider-wrapper {
+    position: relative;
+    padding: 0;
+  }
+
+  .athletes-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 0;
+    padding: 0;
+  }
+
+  .athletes-slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .athlete-card {
+    flex: 0 0 100vw;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .athletes-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .athletes-header {
+      order: -1;
+      width: 100%;
+      padding: 0 40px;
+    }
+
+    .athletes-slider-container {
+      justify-content: flex-start;
+      gap: 4px; /* Gap between items */
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      display: flex;
+    }
+
+    .athlete-clone-start,
+    .athlete-clone-end {
+      display: flex !important;
+    }
+
+    .athlete-card {
+      flex: 0 0 calc((100% - 8px) / 3);
+      max-width: none;
+      scroll-snap-align: start;
+      min-width: 0;
+      width: auto !important;
+    }
+  }
+
+  {% comment %} @media (min-width: 1920px) {
+    .athlete-card {
+      flex: 0 0 calc(25% - 3px);
+    }
+  }
+
+  @media (min-width: 2560px) {
+    .athlete-card {
+      flex: 0 0 calc(20% - 3px);
+    }
+  } {% endcomment %}
+
+  .athlete-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1320 / 1636;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .athlete-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .athlete-name {
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-size: 1.8rem;
+    color: #000000;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .athlete-title {
+    font-size: 1.4rem;
+    color: #666666;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .athlete-instagram {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .athlete-instagram svg {
+    width: 16px;
+    height: 16px;
+    fill: #E4405F;
+  }
+
+  .athlete-instagram-username {
+    font-size: 1.2rem;
+    color: #666666;
+    font-weight: 500;
+    text-transform: none;
+  }
+</style>
+
+<div class="athletes-section">
+  <div class="athletes-container">
+    <!-- Athletes Slider (First) -->
+    <div class="athletes-slider-wrapper">
+      <div class="athletes-slider-container" id="athletes-slider-{{ section.id }}">
+        {%- comment -%} Clone athletes at the end for infinite loop {%- endcomment -%}
+        {% for block in section.blocks %}
+          {% if block.type == 'athlete' %}
+            <div class="athlete-card athlete-clone-end" data-index="{{ forloop.index0 }}">
+              <div class="athlete-image-wrapper">
+                {{
+                  block.settings.video
+                  | video_tag:
+                    class: 'athlete-image',
+                    autoplay: true,
+                    loop: true,
+                    muted: true,
+                    playsinline: true,
+                    controls: false
+                }}
+              </div>
+              <h3 class="athlete-name">
+                {{ block.settings.name }}
+                {% if block.settings.instagram_username != blank %}
+                  <a
+                    href="https://instagram.com/{{ block.settings.instagram_username }}"
+                    class="athlete-instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span class="athlete-instagram-username">@{{ block.settings.instagram_username }}</span>
+                  </a>
+                {% endif %}
+              </h3>
+              {% comment %}
+                {% if block.settings.title != blank %}
+                  <p class="athlete-title">{{ block.settings.title }}</p>
+                {% endif %}
+              {% endcomment %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {%- comment -%} Original athletes {%- endcomment -%}
+        {% for block in section.blocks %}
+          {% if block.type == 'athlete' %}
+            <div class="athlete-card athlete-original" data-index="{{ forloop.index0 }}">
+              <div class="athlete-image-wrapper">
+                {{
+                  block.settings.video
+                  | video_tag:
+                    class: 'athlete-image',
+                    autoplay: true,
+                    loop: true,
+                    muted: true,
+                    playsinline: true,
+                    controls: false
+                }}
+              </div>
+              <h3 class="athlete-name">
+                {{ block.settings.name }}
+                {% if block.settings.instagram_username != blank %}
+                  <a
+                    href="https://instagram.com/{{ block.settings.instagram_username }}"
+                    class="athlete-instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span class="athlete-instagram-username">@{{ block.settings.instagram_username }}</span>
+                  </a>
+                {% endif %}
+              </h3>
+              {% comment %}
+                {% if block.settings.title != blank %}
+                  <p class="athlete-title">{{ block.settings.title }}</p>
+                {% endif %}
+              {% endcomment %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {%- comment -%} Clone athletes at the start for infinite loop {%- endcomment -%}
+        {% for block in section.blocks %}
+          {% if block.type == 'athlete' %}
+            <div class="athlete-card athlete-clone-start" data-index="{{ forloop.index0 }}">
+              <div class="athlete-image-wrapper">
+                {{
+                  block.settings.video
+                  | video_tag:
+                    class: 'athlete-image',
+                    autoplay: true,
+                    loop: true,
+                    muted: true,
+                    playsinline: true,
+                    controls: false
+                }}
+              </div>
+              <h3 class="athlete-name">
+                {{ block.settings.name }}
+                {% if block.settings.instagram_username != blank %}
+                  <a
+                    href="https://instagram.com/{{ block.settings.instagram_username }}"
+                    class="athlete-instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span class="athlete-instagram-username">@{{ block.settings.instagram_username }}</span>
+                  </a>
+                {% endif %}
+              </h3>
+              {% comment %}
+                {% if block.settings.title != blank %}
+                  <p class="athlete-title">{{ block.settings.title }}</p>
+                {% endif %}
+              {% endcomment %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Header and Description (Below Slider) -->
+    <div class="athletes-header">
+      <h2 class="athletes-title">{{ section.settings.title }}</h2>
+      <p class="athletes-description">{{ section.settings.description }}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('athletes-slider-' + sectionId);
+
+    if (!slider) return;
+
+    const originalItems = slider.querySelectorAll('.athlete-original');
+    const totalOriginalItems = originalItems.length;
+    const allItems = slider.querySelectorAll('.athlete-card');
+    const totalAllItems = allItems.length;
+
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let autoSlideInterval = null;
+    let userInteractionTimeout = null;
+
+    // Get card width including gap for calculations
+    function getCardWidth() {
+      const card = slider.querySelector('.athlete-card');
+      if (!card) return window.innerWidth;
+      // On desktop, we have a gap of 4px.
+      // OffsetWidth includes padding and border.
+      // If we are strictly using CSS flex gap, the visual spacing is 4px.
+      // The scroll distance should be card width + gap.
+      const gap = window.innerWidth >= 1024 ? 4 : 0;
+      return card.offsetWidth + gap;
+    }
+
+    // Initialize slider position to start at original items
+    function initializePosition() {
+      currentIndex = totalOriginalItems;
+      const cardWidth = getCardWidth();
+      slider.scrollTo({
+        left: cardWidth * currentIndex,
+        behavior: 'auto',
+      });
+    }
+
+    // Go to next slide
+    function goToNext() {
+      const cardWidth = getCardWidth();
+      currentIndex++;
+      slider.scrollTo({
+        left: cardWidth * currentIndex,
+        behavior: 'smooth',
+      });
+    }
+
+    // Handle infinite loop
+    function handleInfiniteLoop() {
+      if (isTransitioning) return;
+
+      const cardWidth = getCardWidth();
+      const scrollLeft = slider.scrollLeft;
+      const newIndex = Math.round(scrollLeft / cardWidth);
+
+      // If we're at the start clones, jump to end of original items
+      if (newIndex < totalOriginalItems / 2) {
+        isTransitioning = true;
+        currentIndex = newIndex + totalOriginalItems;
+        slider.scrollTo({
+          left: cardWidth * currentIndex,
+          behavior: 'auto',
+        });
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 50);
+      }
+      // If we're at the end clones, jump to start of original items
+      else if (newIndex >= totalOriginalItems * 2 + totalOriginalItems / 2) {
+        isTransitioning = true;
+        currentIndex = newIndex - totalOriginalItems;
+        slider.scrollTo({
+          left: cardWidth * currentIndex,
+          behavior: 'auto',
+        });
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 50);
+      } else {
+        currentIndex = newIndex;
+      }
+    }
+
+    // Start auto-slide
+    function startAutoSlide() {
+      stopAutoSlide();
+      autoSlideInterval = setInterval(() => {
+        goToNext();
+      }, 2000);
+    }
+
+    // Stop auto-slide
+    function stopAutoSlide() {
+      if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+      }
+    }
+
+    // Handle user interaction - pause auto-slide temporarily
+    function handleUserInteraction() {
+      stopAutoSlide();
+
+      // Clear existing timeout
+      if (userInteractionTimeout) {
+        clearTimeout(userInteractionTimeout);
+      }
+
+      // Resume auto-slide after 3 seconds of no interaction
+      userInteractionTimeout = setTimeout(() => {
+        startAutoSlide();
+      }, 5000);
+    }
+
+    // Handle scroll event
+    let scrollTimeout;
+    slider.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        handleInfiniteLoop();
+      }, 150);
+
+      // User is scrolling manually
+      handleUserInteraction();
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      handleUserInteraction();
+    });
+
+    slider.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const cardWidth = getCardWidth();
+
+      if (touchStartX - touchEndX > swipeThreshold) {
+        // Swipe left - go to next
+        currentIndex = Math.min(totalAllItems - 1, currentIndex + 1);
+        slider.scrollTo({
+          left: cardWidth * currentIndex,
+          behavior: 'smooth',
+        });
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        // Swipe right - go to previous
+        currentIndex = Math.max(0, currentIndex - 1);
+        slider.scrollTo({
+          left: cardWidth * currentIndex,
+          behavior: 'smooth',
+        });
+      }
+    }
+
+    // Initialize
+    // Wait for layout to settle to get correct card width
+    setTimeout(() => {
+      initializePosition();
+      startAutoSlide();
+    }, 100);
+
+    // Reinitialize on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        initializePosition();
+        startAutoSlide();
+      }, 250);
+    });
+
+    // Pause auto-slide when page is not visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoSlide();
+      } else {
+        startAutoSlide();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Sponsored Athletes",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Our Sponsored Athletes"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section Description",
+      "default": "Onthego sponsors top athletes and key influencers within the fitness and bodybuilding scene. Our sponsored athletes include Pijie Fitness, Syakir Jamil, Aiman Zolkipli, among others, many of whom are back-to-back bodybuilding champions, reinforcing the brand's credibility and performance-driven positioning."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "athlete",
+      "name": "Athlete",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Athlete Video",
+          "info": "Recommended: Portrait video (e.g., 1320x1636px aspect ratio)"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Athlete Name",
+          "default": "Athlete Name"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Athlete Title/Achievement",
+          "default": "Bodybuilding Champion"
+        },
+        {
+          "type": "text",
+          "id": "instagram_username",
+          "label": "Instagram Username",
+          "info": "Enter username without @ symbol",
+          "default": "ig_username"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsored Athletes",
+      "blocks": [
+        {
+          "type": "athlete",
+          "settings": {
+            "name": "Pijie Fitness",
+            "title": "Fitness Influencer"
+          }
+        },
+        {
+          "type": "athlete",
+          "settings": {
+            "name": "Syakir Jamil",
+            "title": "Bodybuilding Champion"
+          }
+        },
+        {
+          "type": "athlete",
+          "settings": {
+            "name": "Aiman Zolkipli",
+            "title": "Bodybuilding Champion"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

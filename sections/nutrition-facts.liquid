@@ -1,0 +1,461 @@
+{% comment %}
+  Nutrition Facts Section
+  Displays nutrition facts images in a full-width slider for mobile
+{% endcomment %}
+
+<style>
+  .nutrition-facts-section {
+    width: 100%;
+    background-color: #ffffff;
+    color: #000000;
+    max-width: 1400px;
+    margin: auto;
+    padding: 0 8px 8px;
+  }
+
+  @media (min-width: 1024px) {
+    .nutrition-facts-section {
+      padding-bottom: 32px;
+    }
+  }
+
+  .nutrition-facts-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .nutrition-facts-header {
+    text-align: center;
+    margin: 0;
+    {% comment %} padding: 0 24px; {% endcomment %}
+  }
+
+  .nutrition-facts-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 0;
+    color: black;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .nutrition-facts-title {
+      font-size: 36px;
+    }
+  }
+
+  /* Image Slider - Mobile Full Width */
+  .nutrition-slider-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .nutrition-slider {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    display: flex;
+    gap: 0;
+  }
+
+  .nutrition-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nutrition-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    width: 100%;
+    position: relative;
+  }
+
+  .nutrition-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    {% if section.settings.show_border %}
+      border: 2px solid #E6E6E6; /* Dark gray border */
+    {% endif %}
+  }
+
+  /* Desktop: Show images in a grid */
+  @media (min-width: 768px) {
+    .nutrition-slider-wrapper {
+      padding: 0 24px;
+    }
+
+    .nutrition-slider {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      overflow-x: visible;
+      scroll-snap-type: none;
+    }
+
+    .nutrition-slide {
+      flex: none;
+      width: 100%;
+    }
+
+    .nutrition-slide img {
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    {% comment %} .nutrition-slide img:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    } {% endcomment %}
+  }
+
+  @media (min-width: 1024px) {
+    .nutrition-slider-wrapper {
+      padding: 0 30px;
+    }
+
+    .nutrition-slider {
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 10px;
+    }
+  }
+
+  /* Slider Dots - Mobile Only */
+  .nutrition-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 0 24px;
+  }
+
+  @media (min-width: 768px) {
+    .nutrition-dots {
+      display: none;
+    }
+  }
+
+  .nutrition-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+
+  {% comment %} .nutrition-dot:hover {
+    background-color: #9ca3af;
+  } {% endcomment %}
+
+  .nutrition-dot.active {
+    background-color: #000000;
+    width: 24px;
+    border-radius: 4px;
+  }
+</style>
+
+<section class="nutrition-facts-section">
+  <div class="nutrition-facts-container">
+    <!-- Header -->
+    <div class="nutrition-facts-header">
+      <h2 class="nutrition-facts-title">{{ section.settings.title }}</h2>
+    </div>
+
+    <!-- Image Slider -->
+    <div class="nutrition-slider-wrapper">
+      <div class="nutrition-slider" id="nutrition-slider-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'nutrition_image' %}
+            <div class="nutrition-slide" {{ block.shopify_attributes }}>
+              {% if block.settings.image != blank %}
+                <img
+                  src="{{ block.settings.image | image_url: width: 1200 }}"
+                  srcset="
+                    {{ block.settings.image | image_url: width: 600 }} 600w,
+                    {{ block.settings.image | image_url: width: 900 }} 900w,
+                    {{ block.settings.image | image_url: width: 1200 }} 1200w,
+                    {{ block.settings.image | image_url: width: 1500 }} 1500w
+                  "
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  alt="{{ block.settings.alt_text | default: 'Nutrition Facts' }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                  loading="lazy"
+                >
+              {% else %}
+                <div style="width: 100%; height: 400px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+                  <p>Add image</p>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Slider Dots (Mobile Only) -->
+    <div class="nutrition-dots" id="nutrition-dots-{{ section.id }}"></div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('nutrition-slider-' + sectionId);
+    const dotsContainer = document.getElementById('nutrition-dots-' + sectionId);
+
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.nutrition-slide');
+    const slideCount = slides.length;
+
+    if (slideCount === 0) return;
+
+    let currentIndex = 0;
+    let autoPlayInterval = null;
+    let userInteracted = false;
+    let resumeTimeout = null;
+    const autoPlayEnabled = true;
+    const autoPlayDelay = 2000; // Fixed at 2 seconds
+
+    // Create dots (only visible on mobile)
+    function createDots() {
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      for (let i = 0; i < slideCount; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('nutrition-dot');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        if (i === 0) dot.classList.add('active');
+
+        dot.addEventListener('click', function () {
+          goToSlide(i);
+        });
+
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update active dot
+    function updateActiveDot(index) {
+      if (!dotsContainer) return;
+      const dots = dotsContainer.querySelectorAll('.nutrition-dot');
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // Go to specific slide
+    function goToSlide(index) {
+      // Note: We deliberately do NOT update currentIndex here to avoid checking race conditions with the scroll listener.
+      // The scroll listener acts as the source of truth for the current slide index.
+      const slideWidth = slider.clientWidth;
+      if (slideWidth === 0) return; // Safety check
+
+      slider.scrollTo({
+        left: slideWidth * index,
+        behavior: 'smooth',
+      });
+
+      // Optimistically update dots for better UX
+      updateActiveDot(index);
+    }
+
+    // Auto-play functionality
+    function startAutoPlay() {
+      if (!autoPlayEnabled || slideCount <= 1) return;
+
+      // Only auto-play on mobile (screen width < 768px)
+      if (window.innerWidth >= 768) return;
+
+      stopAutoPlay();
+      autoPlayInterval = setInterval(function () {
+        const nextIndex = (currentIndex + 1) % slideCount;
+        goToSlide(nextIndex);
+      }, autoPlayDelay);
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+    }
+
+    function pauseAutoPlay() {
+      stopAutoPlay();
+      userInteracted = true;
+
+      // Resume auto-play after 3 seconds of inactivity
+      clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(function () {
+        userInteracted = false;
+        startAutoPlay();
+      }, 3000);
+    }
+
+    // Update current index on scroll
+    let scrollTimeout;
+    slider.addEventListener('scroll', function () {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(function () {
+        const slideWidth = slider.clientWidth;
+        if (slideWidth === 0) return;
+
+        const scrollLeft = slider.scrollLeft;
+        const newIndex = Math.round(scrollLeft / slideWidth);
+
+        if (newIndex !== currentIndex) {
+          currentIndex = newIndex;
+          updateActiveDot(currentIndex);
+        }
+      }, 100);
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    slider.addEventListener('touchstart', function (e) {
+      touchStartX = e.changedTouches[0].screenX;
+      // Pause auto-play when user touches
+      pauseAutoPlay();
+    });
+
+    slider.addEventListener('mousedown', function () {
+      pauseAutoPlay();
+    });
+
+    slider.addEventListener(
+      'wheel',
+      function () {
+        pauseAutoPlay();
+      },
+      { passive: true }
+    );
+
+    slider.addEventListener('touchend', function (e) {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+
+      if (touchStartX - touchEndX > swipeThreshold) {
+        // Swipe left - go to next
+        if (currentIndex < slideCount - 1) {
+          goToSlide(currentIndex + 1);
+        }
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        // Swipe right - go to previous
+        if (currentIndex > 0) {
+          goToSlide(currentIndex - 1);
+        }
+      }
+    }
+
+    // Initialize
+    createDots();
+    updateActiveDot(currentIndex);
+    startAutoPlay();
+
+    // Reinitialize on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function () {
+        // Reset to first slide on resize
+        currentIndex = 0;
+        slider.scrollTo({
+          left: 0,
+          behavior: 'auto',
+        });
+        updateActiveDot(0);
+
+        // Restart auto-play if on mobile
+        stopAutoPlay();
+        if (window.innerWidth < 768 && !userInteracted) {
+          startAutoPlay();
+        }
+      }, 250);
+    });
+
+    // Stop auto-play when user leaves the page
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        stopAutoPlay();
+      } else if (!userInteracted && window.innerWidth < 768) {
+        startAutoPlay();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Slider Image",
+  "tag": "section",
+  "class": "nutrition-facts-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Nutrition Facts"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show Border on Images",
+      "default": false,
+      "info": "Add a dark gray border around nutrition images"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nutrition_image",
+      "name": "Slider Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Nutrition Facts Image",
+          "info": "Upload a nutrition facts image. Recommended size: 1200x1200px or larger."
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Image Alt Text",
+          "default": "Nutrition Facts",
+          "info": "Describe the image for accessibility and SEO."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slider Image",
+      "blocks": [
+        {
+          "type": "nutrition_image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

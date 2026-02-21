@@ -1,0 +1,162 @@
+{% comment %}
+  Category Grid Section
+  Displays a grid of product categories with hover effects
+{% endcomment %}
+
+<style>
+  .category-grid-wrapper {
+    background-color: white;
+  }
+
+  .category-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 4px;
+  }
+
+  @media (min-width: 1024px) {
+    .category-grid-container {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+  }
+
+  .category-item {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 9.6/14;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 700ms ease;
+  }
+
+  .category-item:hover .category-image {
+    transform: scale(1.05);
+  }
+
+  .category-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .category-overlay {
+      padding-bottom: 32px;
+    }
+  }
+
+  .category-label {
+    background-color: black;
+    color: white;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: all 300ms ease;
+  }
+
+  .category-item:hover .category-label {
+    background-color: white;
+    color: black;
+  }
+</style>
+
+<div class="category-grid-wrapper">
+  <div class="category-grid-container">
+    {% for block in section.blocks %}
+      <a
+        href="{{ block.settings.link }}"
+        class="category-item"
+        {{ block.shopify_attributes }}
+      >
+        {% if block.settings.image %}
+          {{
+            block.settings.image
+            | image_url: width: 800
+            | image_tag: class: 'category-image', loading: 'lazy', alt: block.settings.title
+          }}
+        {% endif %}
+        <div class="category-overlay">
+          <span class="category-label">
+            {{ block.settings.title }}
+          </span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Category Grid",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "CATEGORY"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Grid",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "PRE-WORKOUT"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "PROTEIN"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "LIFTING GEAR"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "APPAREL"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

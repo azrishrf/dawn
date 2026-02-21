@@ -1,0 +1,207 @@
+{% comment %}
+  Logo Grid Section
+  Displays a grid of logos with a title, similar to the community section style.
+{% endcomment %}
+
+<style>
+  .logo-grid-section {
+    background-color: var(--gradient-background);
+    padding: 32px 0 0;
+  }
+
+  @media (min-width: 768px) {
+    .logo-grid-section {
+      padding: 64px 0 0;
+    }
+  }
+
+  .logo-grid-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .logo-grid-header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .logo-grid-title {
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: 700;
+    font-size: 2.4rem;
+    color: black;
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 768px) {
+    .logo-grid-title {
+      font-size: 3.2rem;
+    }
+  }
+
+  /* Grid Layout */
+  .logo-grid-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 0 auto;
+    max-width: 1000px;
+  }
+
+  .logo-grid-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Mobile: 3 columns (approx 33% minus gap) */
+    width: calc(33.333% - 20px);
+    margin-bottom: 20px;
+  }
+
+  /* Desktop/Tablet: 4 columns */
+  @media (min-width: 768px) {
+    .logo-grid-item {
+      width: calc(25% - 22.5px);
+    }
+  }
+
+  .logo-image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(100%); /* Make logo gray */
+    opacity: 0.7; /* Optional: slight opacity to match typical partner logo styles */
+    transition: all 0.3s ease;
+  }
+
+  .logo-image:hover {
+    filter: grayscale(0%); /* Remove grayscale on hover if desired */
+    opacity: 1;
+  }
+</style>
+
+<div class="logo-grid-section">
+  <div class="logo-grid-container">
+    <div class="logo-grid-header">
+      {% if section.settings.title != blank %}
+        <h2 class="logo-grid-title">{{ section.settings.title }}</h2>
+      {% endif %}
+    </div>
+
+    <div class="logo-grid-wrapper">
+      {% for block in section.blocks %}
+        {% if block.type == 'logo_image' %}
+          <div class="logo-grid-item">
+            <div
+              class="logo-image-wrapper"
+              style="width: {{ section.settings.logo_width }}px; height: {{ section.settings.logo_height }}px;"
+            >
+              {% if block.settings.image != blank %}
+                {{
+                  block.settings.image
+                  | image_url: width: 400
+                  | image_tag: class: 'logo-image', loading: 'lazy', alt: block.settings.image.alt
+                }}
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'logo-image' }}
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Logo Grid",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Section Title",
+      "default": "PROUDLY FUELING THE COMMUNITY"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo Max Width",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo Max Height",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_image",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Logo Grid",
+      "blocks": [
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        },
+        {
+          "type": "logo_image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

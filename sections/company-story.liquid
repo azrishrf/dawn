@@ -1,0 +1,343 @@
+{% comment %}
+  Company Story Section
+  Displays company story with image
+{% endcomment %}
+
+<style>
+  .company-story-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .company-story-section {
+      flex-direction: row-reverse;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 32px;
+      gap: 40px;
+    }
+  }
+
+  .company-story-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 24px;
+    {% comment %} background-color: #f9fafb; {% endcomment %}
+    color: #000000;
+    position: relative;
+  }
+
+  @media (min-width: 1024px) {
+    .company-story-content {
+      height: auto;
+      padding: 0;
+    }
+  }
+
+  .company-story-content-inner {
+    position: relative;
+  }
+
+  .company-story-subtitle {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: #4b5563;
+  }
+
+  @media (min-width: 1024px) {
+    .company-story-subtitle {
+      font-size: 16px;
+    }
+  }
+
+  .company-story-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+    color: #000000;
+  }
+
+  @media (min-width: 1024px) {
+    .company-story-title {
+      font-size: 36px;
+    }
+  }
+
+  .founders-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (min-width: 1024px) {
+    .founders-grid {
+      gap: 32px;
+      flex-direction: column;
+    }
+  }
+
+  .founder-card {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    flex: 1;
+  }
+
+  .founder-image-container {
+    position: relative;
+    overflow: hidden;
+    width: 140px;
+    height: 173.8px;
+    border-radius: 8px;
+    margin: 0 auto 16px auto;
+  }
+
+  @media (min-width: 768px) {
+    .founder-image-container {
+      width: 170px;
+      height: 218px;
+    }
+  }
+
+  .founder-image {
+    width: 100%;
+    height: 100%;
+    {% comment %} object-fit: cover; {% endcomment %}
+  }
+
+  .founder-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+    color: #000000;
+    line-height: 14px;
+    margin-bottom: 4px;
+  }
+
+  {% comment %} @media (min-width: 1024px) {
+    .founder-name {
+      {% comment %} font-size: 20px; {% endcomment %}
+    }
+  } {% endcomment %}
+
+  .founder-position {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 14px;
+  }
+
+  @media (min-width: 1024px) {
+    .founder-position {
+      font-size: 16px;
+    }
+  }
+
+  .company-story-text-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .company-story-3text-container{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .company-story-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #000000;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+
+  .company-story-text p {
+    margin: 0;
+  }
+  @media (min-width: 1024px) {
+    .company-story-content-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 64px;
+    }
+
+    .company-story-text-container {
+      width: 75%;
+    }
+
+    .founders-grid {
+      width: 25%;
+      margin-top: 0;
+    }
+  }
+</style>
+
+<div class="company-story-section">
+  <!-- Content Side -->
+  <div class="company-story-content">
+    <div class="company-story-content-inner">
+      <!-- Text Content -->
+      <div class="company-story-text-container">
+        <h3 class="company-story-subtitle">{{ section.settings.subtitle }}</h3>
+        <h2 class="company-story-title">{{ section.settings.title }}</h2>
+
+        <div class="company-story-3text-container">
+          {% if section.settings.text_1 != blank %}
+            <div class="company-story-text">{{ section.settings.text_1 }}</div>
+          {% endif %}
+          {% if section.settings.text_2 != blank %}
+            <div class="company-story-text">{{ section.settings.text_2 }}</div>
+          {% endif %}
+          {% if section.settings.text_3 != blank %}
+            <div class="company-story-text">{{ section.settings.text_3 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Founders Grid -->
+      <div class="founders-grid">
+        <!-- Founder 1 -->
+        <div class="founder-card">
+          <div class="founder-image-container">
+            {% if section.settings.founder1_image %}
+              <img
+                src="{{ section.settings.founder1_image | image_url: width: 600, height: 745 }}"
+                alt="{{ section.settings.founder1_name }}"
+                width="600"
+                height="745"
+                class="founder-image"
+                loading="lazy"
+              >
+            {% endif %}
+          </div>
+          <h3 class="founder-name">{{ section.settings.founder1_name }}</h3>
+          <p class="founder-position">{{ section.settings.founder1_position }}</p>
+        </div>
+
+        <!-- Founder 2 -->
+        <div class="founder-card">
+          <div class="founder-image-container">
+            {% if section.settings.founder2_image %}
+              <img
+                src="{{ section.settings.founder2_image | image_url: width: 600, height: 745 }}"
+                alt="{{ section.settings.founder2_name }}"
+                width="600"
+                height="745"
+                class="founder-image"
+                loading="lazy"
+              >
+            {% endif %}
+          </div>
+          <h3 class="founder-name">{{ section.settings.founder2_name }}</h3>
+          <p class="founder-position">{{ section.settings.founder2_position }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Company Story",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "OUR STORY"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "FROM PASSION TO PERFECTION"
+    },
+    {
+      "type": "header",
+      "content": "Founder 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "founder1_image",
+      "label": "Founder 1 Image",
+      "info": "Recommended: Portrait image (e.g., 1856x2304px or 600x745px)"
+    },
+    {
+      "type": "text",
+      "id": "founder1_name",
+      "label": "Founder 1 Name",
+      "default": "John Doe"
+    },
+    {
+      "type": "text",
+      "id": "founder1_position",
+      "label": "Founder 1 Position",
+      "default": "Co-Founder & CEO"
+    },
+    {
+      "type": "header",
+      "content": "Founder 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "founder2_image",
+      "label": "Founder 2 Image",
+      "info": "Recommended: Portrait image (e.g., 1856x2304px or 600x745px)"
+    },
+    {
+      "type": "text",
+      "id": "founder2_name",
+      "label": "Founder 2 Name",
+      "default": "Jane Smith"
+    },
+    {
+      "type": "text",
+      "id": "founder2_position",
+      "label": "Founder 2 Position",
+      "default": "Co-Founder & COO"
+    },
+    {
+      "type": "header",
+      "content": "Story Content"
+    },
+    {
+      "type": "richtext",
+      "id": "text_1",
+      "label": "First Paragraph",
+      "default": "<p>What began as a small operation in a humble kitchen has grown into a trusted name in premium seasonings. Every product represents our commitment to quality and innovation.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "text_2",
+      "label": "Second Paragraph",
+      "default": "<p>What began as a small operation in a humble kitchen has grown into a trusted name in premium seasonings. Every product represents our commitment to quality and innovation.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "text_3",
+      "label": "Third Paragraph",
+      "default": "<p>What began as a small operation in a humble kitchen has grown into a trusted name in premium seasonings. Every product represents our commitment to quality and innovation.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Company Story"
+    }
+  ]
+}
+{% endschema %}

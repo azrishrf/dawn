@@ -1,0 +1,562 @@
+{% comment %}
+  Features Section - Slider
+  Displays feature icons with titles and descriptions in a horizontal slider
+{% endcomment %}
+
+<style>
+  .features-section {
+    background-color: {{ section.settings.background_color }};
+    padding-top: 32px;
+    padding-bottom: 32px;
+    position: relative;
+  }
+
+  .features-slider-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    {% comment %} padding: 0 16px; {% endcomment %}
+  }
+
+  .features-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 0;
+  }
+
+  .features-slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .feature-item {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    {% comment %} padding: 0 24px; {% endcomment %}
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 768px) {
+    .features-slider-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px 0;
+      justify-items: center;
+    }
+
+    .feature-clone-start,
+    .feature-clone-end {
+      display: none !important;
+    }
+
+    .feature-item {
+      flex: 0 0 50%;
+      scroll-snap-align: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .features-slider-container {
+      grid-template-columns: repeat(4, 1fr);
+      {% comment %} gap: 40px 0; {% endcomment %}
+      {% comment %} justify-items: center; {% endcomment %}
+    }
+
+    .feature-item {
+      {% comment %} flex: 0 0 25%; {% endcomment %}
+      flex-direction: row;
+      text-align: left;
+    }
+  }
+
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (min-width: 1024px) {
+    .feature-icon {
+      margin-bottom: 0;
+      margin-right: 10px;
+    }
+  }
+
+  .feature-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .feature-content h3 {
+    font-weight: bold;
+    color: {{ section.settings.text_color }};
+    margin: 0 !important;
+  }
+
+  .feature-content p {
+    font-size: 12px;
+    font-weight: 500;
+    color: {{ section.settings.text_color }};
+    letter-spacing: 0.025em;
+    margin: 0;
+  }
+
+  /* Dot Indicators */
+  .slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+
+  .slider-dot.active {
+    background-color: #000000;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .slider-dot:hover {
+    background-color: #6b7280;
+  }
+
+  @media (min-width: 768px) {
+    .slider-dots {
+      visibility: hidden;
+    }
+  }
+</style>
+
+<div class="features-section">
+  <div class="features-slider-wrapper">
+    <div class="features-slider-container" id="features-slider-{{ section.id }}">
+      {%- comment -%} Clone slides at the end for infinite loop (will be moved to start via JS) {%- endcomment -%}
+      {% for block in section.blocks %}
+        {% if block.type == 'feature' %}
+          <div class="feature-item feature-clone-end" data-index="{{ forloop.index0 }}">
+            <div class="feature-icon">
+              <img
+                src="{{ block.settings.icon | img_url: '200x' }}"
+                alt="{{ block.settings.title }}"
+                width="80"
+                height="80"
+                loading="lazy"
+              >
+            </div>
+            <div class="feature-content">
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.description }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {%- comment -%} Original slides {%- endcomment -%}
+      {% for block in section.blocks %}
+        {% if block.type == 'feature' %}
+          <div class="feature-item feature-original" data-index="{{ forloop.index0 }}">
+            <div class="feature-icon">
+              <img
+                src="{{ block.settings.icon | img_url: '200x' }}"
+                alt="{{ block.settings.title }}"
+                width="80"
+                height="80"
+                loading="lazy"
+              >
+            </div>
+            <div class="feature-content">
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.description }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {%- comment -%} Clone slides at the start for infinite loop {%- endcomment -%}
+      {% for block in section.blocks %}
+        {% if block.type == 'feature' %}
+          <div class="feature-item feature-clone-start" data-index="{{ forloop.index0 }}">
+            <div class="feature-icon">
+              <img
+                src="{{ block.settings.icon | img_url: '200x' }}"
+                alt="{{ block.settings.title }}"
+                width="80"
+                height="80"
+                loading="lazy"
+              >
+            </div>
+            <div class="feature-content">
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.description }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="slider-dots" id="features-dots-{{ section.id }}"></div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('features-slider-' + sectionId);
+    const dotsContainer = document.getElementById('features-dots-' + sectionId);
+
+    if (!slider || !dotsContainer) return;
+
+    const originalItems = slider.querySelectorAll('.feature-original');
+    const totalOriginalItems = originalItems.length;
+    const allItems = slider.querySelectorAll('.feature-item');
+    const totalAllItems = allItems.length;
+
+    let currentIndex = 0;
+    let itemsPerView = 1;
+    let isTransitioning = false;
+
+    // Calculate items per view based on screen size
+    function getItemsPerView() {
+      const width = window.innerWidth;
+      if (width >= 1024) return 4;
+      if (width >= 768) return 2;
+      return 1;
+    }
+
+    // Initialize slider position to start at original items (middle set)
+    function initializePosition() {
+      itemsPerView = getItemsPerView();
+      // Start at the first original item (after the first set of clones)
+      currentIndex = totalOriginalItems;
+      const itemWidth = slider.scrollWidth / totalAllItems;
+      slider.scrollTo({
+        left: itemWidth * currentIndex,
+        behavior: 'auto',
+      });
+    }
+
+    // Create dots (only for original items)
+    function createDots() {
+      dotsContainer.innerHTML = '';
+      itemsPerView = getItemsPerView();
+
+      // Calculate number of unique pages/groups
+      // For infinite scroll, we only show dots for the original items
+      const totalDots = totalOriginalItems;
+
+      for (let i = 0; i < totalDots; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('slider-dot');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update dots based on current position
+    function updateDots() {
+      const dots = dotsContainer.querySelectorAll('.slider-dot');
+      // Map current index to original items index (0 to totalOriginalItems-1)
+      let originalIndex = currentIndex - totalOriginalItems;
+      if (originalIndex < 0) originalIndex += totalOriginalItems;
+      if (originalIndex >= totalOriginalItems) originalIndex -= totalOriginalItems;
+
+      // Each dot represents one item, not a page
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === originalIndex);
+      });
+    }
+
+    // Go to specific slide (slideIndex is the item index, not page index)
+    function goToSlide(slideIndex) {
+      // Navigate to the specific item in the original set
+      const targetIndex = totalOriginalItems + slideIndex;
+      currentIndex = targetIndex;
+      const itemWidth = slider.scrollWidth / totalAllItems;
+      slider.scrollTo({
+        left: itemWidth * currentIndex,
+        behavior: 'smooth',
+      });
+      updateDots();
+    }
+
+    // Handle infinite loop - check if we need to jump to clone
+    function handleInfiniteLoop() {
+      if (isTransitioning) return;
+
+      const itemWidth = slider.scrollWidth / totalAllItems;
+      const scrollLeft = slider.scrollLeft;
+      const newIndex = Math.round(scrollLeft / itemWidth);
+
+      // If we're at the start clones (first set), jump to end of original items
+      if (newIndex < totalOriginalItems / 2) {
+        isTransitioning = true;
+        currentIndex = newIndex + totalOriginalItems;
+        slider.scrollTo({
+          left: itemWidth * currentIndex,
+          behavior: 'auto',
+        });
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 50);
+      }
+      // If we're at the end clones (last set), jump to start of original items
+      else if (newIndex >= totalOriginalItems * 2 + totalOriginalItems / 2) {
+        isTransitioning = true;
+        currentIndex = newIndex - totalOriginalItems;
+        slider.scrollTo({
+          left: itemWidth * currentIndex,
+          behavior: 'auto',
+        });
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 50);
+      } else {
+        currentIndex = newIndex;
+      }
+
+      updateDots();
+    }
+
+    // Handle scroll event
+    let scrollTimeout;
+    slider.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        handleInfiniteLoop();
+      }, 150);
+      handleUserInteraction(); // Pause auto-slide on manual scroll
+    });
+
+    // Touch swipe support with infinite loop
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartScrollLeft = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartScrollLeft = slider.scrollLeft;
+      handleUserInteraction(); // Pause auto-slide on touch
+    });
+
+    slider.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const itemWidth = slider.scrollWidth / totalAllItems;
+
+      if (touchStartX - touchEndX > swipeThreshold) {
+        // Swipe left - go to next
+        currentIndex = Math.min(totalAllItems - itemsPerView, currentIndex + itemsPerView);
+        slider.scrollTo({
+          left: itemWidth * currentIndex,
+          behavior: 'smooth',
+        });
+        updateDots();
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        // Swipe right - go to previous
+        currentIndex = Math.max(0, currentIndex - itemsPerView);
+        slider.scrollTo({
+          left: itemWidth * currentIndex,
+          behavior: 'smooth',
+        });
+        updateDots();
+      }
+    }
+
+    // Auto-slide variables
+    let autoSlideInterval = null;
+    let userInteractionTimeout = null;
+
+    // Go to next slide
+    function goToNext() {
+      const itemWidth = slider.scrollWidth / totalAllItems;
+      currentIndex++;
+      slider.scrollTo({
+        left: itemWidth * currentIndex,
+        behavior: 'smooth',
+      });
+      updateDots();
+    }
+
+    // Start auto-slide
+    function startAutoSlide() {
+      stopAutoSlide();
+      // Only auto-slide on mobile
+      if (window.innerWidth >= 768) return;
+
+      autoSlideInterval = setInterval(() => {
+        goToNext();
+      }, 1000); // 1000 miliseconds
+    }
+
+    // Stop auto-slide
+    function stopAutoSlide() {
+      if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+      }
+    }
+
+    // Handle user interaction - pause auto-slide temporarily
+    function handleUserInteraction() {
+      stopAutoSlide();
+
+      // Only resume if mobile
+      if (window.innerWidth >= 768) return;
+
+      // Clear existing timeout
+      if (userInteractionTimeout) {
+        clearTimeout(userInteractionTimeout);
+      }
+
+      // Resume auto-slide after 5 seconds of no interaction
+      userInteractionTimeout = setTimeout(() => {
+        startAutoSlide();
+      }, 1000);
+    }
+
+    // Initialize
+    createDots();
+    initializePosition();
+    updateDots();
+    if (window.innerWidth < 768) {
+      startAutoSlide(); // Start auto-slide only on mobile
+    }
+
+    // Reinitialize on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        createDots();
+        initializePosition();
+        updateDots();
+
+        if (window.innerWidth < 768) {
+          startAutoSlide();
+        } else {
+          stopAutoSlide();
+        }
+      }, 250);
+    });
+
+    // Pause auto-slide when page is not visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoSlide();
+      } else {
+        if (window.innerWidth < 768) {
+          startAutoSlide();
+        }
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Features Products - Home",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Title",
+          "default": "PREMIUM INGREDIENTS"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Feature Description",
+          "default": "SOURCED GLOBALLY FOR QUALITY."
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Feature Icon",
+          "info": "Recommended size: 80x80px"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "title": "PREMIUM INGREDIENTS",
+            "description": "SOURCED GLOBALLY FOR QUALITY."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "FULL TRANSPARENCY",
+            "description": "NO HIDDEN BLENDS. EVER."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "THIRD-PARTY TESTED",
+            "description": "QUALITY, CONSISTENCY, TRUST."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "ATHLETE BUILT",
+            "description": "FORMULAS MADE BY REAL ATHLETES."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

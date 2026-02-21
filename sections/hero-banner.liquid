@@ -1,0 +1,355 @@
+{% comment %}
+  Hero Banner Section V2
+  Displays a full-width hero image/video with CTA button positioned at bottom left
+{% endcomment %}
+
+<style>
+  .hero-container-v2 {
+    position: relative;
+    width: 100%;
+    background-color: #000000;
+    overflow: hidden;
+    aspect-ratio: 1500/2250;
+    max-height: 100vh;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-container-v2 {
+      aspect-ratio: auto !important;
+      height: {{ section.settings.desktop_height }}vh;
+      max-height: {{ section.settings.desktop_height }}vh;
+    }
+  }
+
+  .hero-image-wide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-image-mobile,
+  .hero-video-mobile {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-image-desktop {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-image-mobile,
+    .hero-video-mobile {
+      display: none;
+    }
+
+    .hero-image-desktop {
+      display: block;
+    }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 30px;
+    padding-bottom: 32px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .hero-overlay {
+      justify-content: flex-start;
+      {% comment %} padding: 80px; {% endcomment %}
+      {% comment %} padding-bottom: 80px; {% endcomment %}
+    }
+  }
+
+  .hero-cta-button {
+    display: inline-block;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: var(--font-body-family);
+    font-style: var(--font-body-style);
+    font-size: 1.6rem;
+    font-weight: var(--font-body-weight-bold);
+    padding: 1.2rem 2.4rem;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .hero-tagline {
+    margin: 0 0 1.6rem 0;
+    color: #ffffff;
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    {% comment %} text-transform: uppercase; {% endcomment %}
+    line-height: 1.3;
+  }
+
+  .hero-tagline strong {
+    font-weight: 700;
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    .hero-cta-button {
+      font-size: 1.6rem;
+      padding: 1.6rem 3.2rem;
+    }
+
+    .hero-tagline {
+      {% comment %} font-size: 2.8rem; {% endcomment %}
+      letter-spacing: 0.12em;
+    }
+  }
+
+  .hero-tagline .line-1 {
+    font-size: {{ section.settings.line_1_size_mobile }}px;
+  }
+  .hero-tagline .line-2 {
+    font-size: {{ section.settings.line_2_size_mobile }}px;
+  }
+
+  @media (min-width: 768px) {
+    .hero-tagline .line-1 {
+      font-size: {{ section.settings.line_1_size_desktop }}px;
+    }
+    .hero-tagline .line-2 {
+      font-size: {{ section.settings.line_2_size_desktop }}px;
+    }
+  }
+
+  .hero-cta-button:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (min-width: 2300px) {
+    .hero-container-v2 {
+      aspect-ratio: 2400/1350 !important;
+      {% comment %} max-height: 120vh; {% endcomment %}
+    }
+
+    {% if section.settings.wide_desktop_image != blank %}
+    .hero-image-desktop {
+      display: none !important;
+    }
+    .hero-image-wide {
+      display: block !important;
+    }
+    {% endif %}
+  }
+</style>
+
+<div class="hero-container-v2">
+  <!-- Mobile Video or Image -->
+  {% if section.settings.mobile_video != blank %}
+    {{
+      section.settings.mobile_video
+      | video_tag:
+        class: 'hero-video-mobile',
+        autoplay: true,
+        loop: true,
+        muted: true,
+        playsinline: true,
+        controls: false
+    }}
+  {% else %}
+    <!-- Mobile Image (fallback when no video) -->
+    <img
+      src="{{ section.settings.mobile_image | img_url: '1500x' }}"
+      alt="{{ section.settings.title }}"
+      width="1500"
+      height="2250"
+      class="hero-image-mobile"
+      loading="eager"
+    >
+  {% endif %}
+
+  <!-- Desktop Image -->
+  <img
+    src="{{ section.settings.desktop_image | img_url: '2400x' }}"
+    alt="{{ section.settings.title }}"
+    width="2400"
+    height="1350"
+    class="hero-image-desktop"
+    loading="eager"
+  >
+
+  <!-- Wide Desktop Image -->
+  {% if section.settings.wide_desktop_image != blank %}
+    <img
+      src="{{ section.settings.wide_desktop_image | img_url: '3840x' }}"
+      alt="{{ section.settings.title }}"
+      width="3840"
+      height="2160"
+      class="hero-image-wide"
+      loading="eager"
+    >
+  {% endif %}
+
+  <!-- Overlay Content - Bottom Left Positioned -->
+  <div class="hero-overlay">
+    <div class="animate-fade-in-up">
+      <p class="hero-tagline">
+        <strong class="line-1">{{ section.settings.tagline_line_1 }}</strong>
+        <span class="line-2">{{ section.settings.tagline_line_2 }}</span>
+      </p>
+      <a
+        href="{{ section.settings.button_link }}"
+        class="hero-cta-button"
+      >
+        {{ section.settings.button_text }}
+      </a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image",
+      "info": "Recommended size: 2400x1350px"
+    },
+    {
+      "type": "image_picker",
+      "id": "wide_desktop_image",
+      "label": "Wide Desktop Image",
+      "info": "Image for screens larger than 2300px. Recommended width 3840px."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image",
+      "info": "Recommended size: 1500x2250px (Used as fallback if no video)"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "Mobile Video",
+      "info": "Video for mobile view. Recommended: 1500x2250px aspect ratio (portrait). Will autoplay, loop, and be muted."
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Desktop Height",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Image Alt Text",
+      "default": "Hero Banner"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "SHOP YOUR FLAVORS"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "text",
+      "id": "tagline_line_1",
+      "label": "Tagline Line 1 (Bold)",
+      "default": "Malaysia's Leading"
+    },
+    {
+      "type": "text",
+      "id": "tagline_line_2",
+      "label": "Tagline Line 2",
+      "default": "Diet & Fitness Brand"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "line_1_size_mobile",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Line 1 Size (Mobile)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "line_1_size_desktop",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Line 1 Size (Desktop)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "line_2_size_mobile",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Line 2 Size (Mobile)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "line_2_size_desktop",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Line 2 Size (Desktop)",
+      "default": 28
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner"
+    }
+  ]
+}
+{% endschema %}

@@ -31,13 +31,14 @@
   }
 
   .rich-text__blocks {
-    max-width: 50rem;
+    max-width: 100%; /* Full width instead of 50rem */
+    text-align: left; /* Left-aligned text */
   }
 }
 
 @media screen and (min-width: 990px) {
   .rich-text__blocks {
-    max-width: 78rem;
+    max-width: 100%; /* Full width instead of 78rem */
   }
 }
 

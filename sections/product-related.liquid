@@ -1,0 +1,232 @@
+<!-- Related Products Section -->
+<div class="related-products-section">
+  <div class="related-products-container">
+    <h2 class="related-products-heading">
+      {{ section.settings.heading | default: 'YOU MIGHT LIKE' }}
+    </h2>
+
+    {% if section.settings.product_list != blank %}
+      <div class="related-products-grid">
+        {% for product_item in section.settings.product_list %}
+          {% assign related_product = product_item %}
+          <a href="{{ related_product.url }}" class="product-card">
+            <div class="product-image-wrapper">
+              {% if related_product.tags contains 'new' or related_product.tags contains 'NEW' %}
+                <div class="product-badge">NEW</div>
+              {% endif %}
+              {% if related_product.featured_image %}
+                <img
+                  src="{{ related_product.featured_image | image_url: width: 600 }}"
+                  alt="{{ related_product.title }}"
+                  class="product-image"
+                  width="600"
+                  height="{{ 600 | divided_by: related_product.featured_image.aspect_ratio | ceil }}"
+                  loading="lazy"
+                >
+              {% endif %}
+            </div>
+            <div class="product-info">
+              <h3 class="product-card-title">
+                {{ related_product.title }}
+              </h3>
+              <div class="product-prices">
+                {% if related_product.compare_at_price > related_product.price %}
+                  <span class="product-compare-price">
+                    {{ related_product.compare_at_price | money }}
+                  </span>
+                {% endif %}
+                <span class="product-price-value">{{ related_product.price | money }}</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Fallback to recommended products if no products are selected -->
+      {% assign recommended_products = product %}
+      {% if recommended_products.size > 0 %}
+        <div class="related-products-grid">
+          {% for related_product in recommended_products %}
+            <a href="{{ related_product.url }}" class="product-card">
+              <div class="product-image-wrapper">
+                {% if related_product.tags contains 'new' or related_product.tags contains 'NEW' %}
+                  <div class="product-badge">NEW</div>
+                {% endif %}
+                {% if related_product.featured_image -%}
+                  age_url: width: 600 }}" alt="{{ related_product.title }}" class="product-image" width="600" height="
+                  {{- 600 | divided_by: related_product.featured_image.aspect_ratio | ceil -}}
+                  uct.featured_image | img_url: '600x' }}" alt="{{ related_product.title }}" class="product-image"
+                  loading="lazy" />
+                {% endif %}
+              </div>
+              <div class="product-info">
+                <h3 class="product-card-title">
+                  {{ related_product.title }}
+                </h3>
+                <div class="product-prices">
+                  {% if related_product.compare_at_price > related_product.price %}
+                    <span class="product-compare-price">
+                      {{ related_product.compare_at_price | money }}
+                    </span>
+                  {% endif %}
+                  <span class="product-price-value">{{ related_product.price | money }}</span>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .related-products-section {
+    {% comment %} padding: 64px 0; {% endcomment %}
+    background-color: #f9fafb;
+  }
+
+  .related-products-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .related-products-container {
+      padding-left: 48px;
+      padding-right: 48px;
+    }
+  }
+
+  .related-products-heading {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 32px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  .related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    .related-products-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-products-grid {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+    }
+  }
+
+  .product-card {
+    background-color: #fff;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background-color: #f3f4f6;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #000;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 12px;
+    z-index: 10;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .product-info {
+    padding: 0 12px 16px;
+    width: 100%;
+  }
+
+  .product-card-title {
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    word-wrap: break-word;
+  }
+
+  @media (min-width: 1024px) {
+    .product-card-title {
+      font-size: 14px;
+    }
+  }
+
+  .product-prices {
+    text-align: center;
+  }
+
+  .product-compare-price {
+    font-size: 14px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin-right: 8px;
+  }
+
+  .product-price-value {
+    font-weight: 500;
+    color: #4b5563;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Related Products",
+  "tag": "section",
+  "class": "related-products-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "YOU MIGHT LIKE"
+    },
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Select Products",
+      "limit": 10,
+      "info": "Leave empty to show automatically recommended products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Related Products"
+    }
+  ]
+}
+{% endschema %}

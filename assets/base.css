@@ -5,7 +5,8 @@
   --alpha-badge-border: 0.1;
   --focused-base-outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
   --focused-base-outline-offset: 0.3rem;
-  --focused-base-box-shadow: 0 0 0 0.3rem rgb(var(--color-background)), 0 0 0.5rem 0.4rem rgba(var(--color-foreground), 0.3);
+  --focused-base-box-shadow: 0 0 0 0.3rem rgb(var(--color-background)),
+    0 0 0.5rem 0.4rem rgba(var(--color-foreground), 0.3);
 }
 
 .product-card-wrapper .card,
@@ -259,11 +260,11 @@ h5,
 .h4,
 .h5 {
   font-family: var(--font-heading-family);
-  font-style: var(--font-heading-style);
-  font-weight: var(--font-heading-weight);
-  letter-spacing: calc(var(--font-heading-scale) * 0.06rem);
-  color: rgb(var(--color-foreground));
-  line-height: calc(1 + 0.3 / max(1, var(--font-heading-scale)));
+  /* font-style: var(--font-heading-style); */
+  /* font-weight: var(--font-heading-weight); */
+  /* letter-spacing: calc(var(--font-heading-scale) * 0.06rem); */
+  /* color: rgb(var(--color-foreground)); */
+  /* line-height: calc(1 + 0.3 / max(1, var(--font-heading-scale))); */
   word-break: break-word;
 }
 
@@ -317,7 +318,7 @@ h2,
   }
 }
 
-h3,
+/* h3,
 .h3 {
   font-size: calc(var(--font-heading-scale) * 1.7rem);
 }
@@ -327,7 +328,7 @@ h3,
   .h3 {
     font-size: calc(var(--font-heading-scale) * 1.8rem);
   }
-}
+} */
 
 h4,
 .h4 {
@@ -531,19 +532,19 @@ a:not([href]) {
   display: none;
 }
 
-hr {
+/* hr {
   border: none;
   height: 0.1rem;
   background-color: rgba(var(--color-foreground), 0.2);
   display: block;
   margin: 5rem 0;
-}
+} */
 
-@media screen and (min-width: 750px) {
+/* @media screen and (min-width: 750px) {
   hr {
     margin: 7rem 0;
   }
-}
+} */
 
 .full-unstyled-link {
   text-decoration: none;
@@ -1217,7 +1218,7 @@ button.shopify-payment-button__button--unbranded {
   border: 0;
   padding: 0 3rem;
   cursor: pointer;
-  font: inherit;
+  font-family: var(--font-body-family);
   font-size: 1.5rem;
   text-decoration: none;
   color: rgb(var(--color-button-text));
@@ -1320,15 +1321,14 @@ button.shopify-payment-button__button--unbranded {
 
 shopify-accelerated-checkout {
   --shopify-accelerated-checkout-button-border-radius: var(--buttons-radius-outset);
-  --shopify-accelerated-checkout-button-box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius)
-  rgba(var(--color-shadow), var(--shadow-opacity));
+  --shopify-accelerated-checkout-button-box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset)
+    var(--shadow-blur-radius) rgba(var(--color-shadow), var(--shadow-opacity));
 }
 shopify-accelerated-checkout-cart {
   --shopify-accelerated-checkout-button-border-radius: var(--buttons-radius-outset);
-  --shopify-accelerated-checkout-button-box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius)
-  rgba(var(--color-shadow), var(--shadow-opacity));
+  --shopify-accelerated-checkout-button-box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset)
+    var(--shadow-blur-radius) rgba(var(--color-shadow), var(--shadow-opacity));
 }
-
 
 /* Button - other */
 

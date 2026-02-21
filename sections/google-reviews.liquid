@@ -1,0 +1,568 @@
+{% comment %}
+  Google Reviews Section
+  Displays Google reviews with rating, slider, and CTA button
+{% endcomment %}
+
+<style>
+  .google-reviews-section {
+    background-color: #f9fafb;
+    padding-bottom: 10px;
+    position: relative;
+  }
+
+  .google-reviews-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* Header Section */
+  .google-reviews-header {
+    text-align: center;
+    margin-bottom: 16px;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .google-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .google-logo {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .google-logo .g {
+    color: #4285f4;
+  }
+  .google-logo .o1 {
+    color: #ea4335;
+  }
+  .google-logo .o2 {
+    color: #fbbc04;
+  }
+  .google-logo .g2 {
+    color: #4285f4;
+  }
+  .google-logo .l {
+    color: #34a853;
+  }
+  .google-logo .e {
+    color: #ea4335;
+  }
+
+  .google-reviews-text {
+    font-size: 26px;
+    font-weight: 700;
+    color: #000000;
+    margin-left: 8px;
+  }
+
+  .google-rating-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .google-rating-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000000;
+    line-height: 1;
+  }
+
+  .google-stars {
+    display: flex;
+    gap: 4px;
+  }
+
+  .google-star {
+    color: #fbbc04;
+    font-size: 28px;
+  }
+
+  .google-review-count {
+    font-size: 16px;
+    color: #5f6368;
+    margin-left: 8px;
+  }
+
+  .google-cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #4285f4;
+    color: #ffffff;
+    padding: 10px 28px;
+    border-radius: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+  }
+
+  .google-cta-button:hover {
+    background-color: #3367d6;
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* Reviews Slider */
+  .reviews-slider-wrapper {
+    position: relative;
+  }
+
+  .reviews-slider-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+
+  .reviews-slider-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .review-card {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  @media (min-width: 768px) {
+    .review-card {
+      flex: 0 0 380px;
+    }
+  }
+
+  .review-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .reviewer-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #e5e7eb;
+  }
+
+  .reviewer-info {
+    flex: 1;
+  }
+
+  .reviewer-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .verified-badge {
+    width: 16px;
+    height: 16px;
+    color: #4285f4;
+  }
+
+  .review-stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .review-star {
+    color: #fbbc04;
+    font-size: 20px;
+  }
+
+  .review-star.empty {
+    color: #e5e7eb;
+  }
+
+  .review-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #3c4043;
+    margin: 0 0 12px 0;
+  }
+
+  .review-image {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .review-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .review-card-link:hover {
+    color: inherit;
+  }
+
+  /* Dot Indicators */
+  .reviews-slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .review-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+
+  .review-dot.active {
+    background-color: #4285f4;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .review-dot:hover {
+    background-color: #9ca3af;
+  }
+</style>
+
+<div class="google-reviews-section">
+  <div class="google-reviews-container">
+    <!-- Header with Google Rating -->
+    <div class="google-reviews-header">
+      <div class="google-logo-wrapper">
+        <div class="google-logo">
+          <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span
+          ><span class="l">l</span><span class="e">e</span>
+        </div>
+        <span class="google-reviews-text">Reviews</span>
+      </div>
+
+      <div class="google-rating-wrapper">
+        <div class="google-rating-number">{{ section.settings.average_rating }}</div>
+        <div>
+          <div class="google-stars">
+            {% assign rating = section.settings.average_rating | times: 1.0 %}
+            {% for i in (1..5) %}
+              <span class="google-star">★</span>
+            {% endfor %}
+          </div>
+          {% comment %}
+            {% if section.settings.review_count != blank %}
+              <span class="google-review-count">({{ section.settings.review_count }})</span>
+            {% endif %}
+          {% endcomment %}
+        </div>
+      </div>
+
+      {% if section.settings.google_review_url != blank %}
+        <a href="{{ section.settings.google_review_url }}" target="_blank" rel="noopener" class="google-cta-button">
+          Review us on Google
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Reviews Slider -->
+    <div class="reviews-slider-wrapper">
+      <div class="reviews-slider-container" id="reviews-slider-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'review' %}
+            <div class="review-card" data-review-item data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+              {% if block.settings.review_url != blank %}
+                <a href="{{ block.settings.review_url }}" target="_blank" rel="noopener" class="review-card-link">
+              {% endif %}
+
+              <div class="review-header">
+                {% if block.settings.reviewer_image != blank %}
+                  <img
+                    src="{{ block.settings.reviewer_image | image_url: width: 96 }}"
+                    alt="{{ block.settings.reviewer_name }}"
+                    class="reviewer-avatar"
+                    width="48"
+                    height="48"
+                    loading="lazy"
+                  >
+                {% else %}
+                  <div
+                    class="reviewer-avatar"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+                  ></div>
+                {% endif %}
+
+                <div class="reviewer-info">
+                  <h3 class="reviewer-name">
+                    {{ block.settings.reviewer_name }}
+                  </h3>
+                  <div class="review-stars">
+                    {% assign stars = block.settings.star_rating | times: 1 %}
+                    {% for i in (1..5) %}
+                      {% if i <= stars %}
+                        <span class="review-star">★</span>
+                      {% else %}
+                        <span class="review-star empty">★</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <p class="review-text">{{ block.settings.review_text }}</p>
+
+              {% if block.settings.review_image != blank %}
+                <img
+                  src="{{ block.settings.review_image | image_url: width: 600 }}"
+                  alt="Review image"
+                  class="review-image"
+                  width="600"
+                  height="200"
+                  loading="lazy"
+                >
+              {% endif %}
+
+              {% if block.settings.review_url != blank %}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="reviews-slider-dots" id="reviews-dots-{{ section.id }}"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const slider = document.getElementById('reviews-slider-' + sectionId);
+    const dotsContainer = document.getElementById('reviews-dots-' + sectionId);
+
+    if (!slider) return;
+
+    const reviewItems = slider.querySelectorAll('[data-review-item]');
+    const totalItems = reviewItems.length;
+
+    let currentIndex = 0;
+
+    // Create dots
+    function createDots() {
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+
+      for (let i = 0; i < totalItems; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('review-dot');
+        dot.setAttribute('aria-label', 'Go to review ' + (i + 1));
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update dots based on current position
+    function updateDots() {
+      if (!dotsContainer) return;
+      const dots = dotsContainer.querySelectorAll('.review-dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
+    }
+
+    // Go to specific slide
+    function goToSlide(slideIndex) {
+      currentIndex = slideIndex;
+      const reviewItem = reviewItems[slideIndex];
+      if (reviewItem) {
+        reviewItem.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      }
+      updateDots();
+    }
+
+    // Handle scroll event to update dots
+    let scrollTimeout;
+    slider.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Find which review is most visible
+        let maxVisibility = 0;
+        let mostVisibleIndex = 0;
+
+        reviewItems.forEach((item, index) => {
+          const rect = item.getBoundingClientRect();
+          const sliderRect = slider.getBoundingClientRect();
+
+          const visibleWidth = Math.min(rect.right, sliderRect.right) - Math.max(rect.left, sliderRect.left);
+          const visibility = visibleWidth / rect.width;
+
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+            mostVisibleIndex = index;
+          }
+        });
+
+        currentIndex = mostVisibleIndex;
+        updateDots();
+      }, 100);
+    });
+
+    // Initialize
+    createDots();
+    updateDots();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Google Reviews",
+  "tag": "section",
+  "class": "google-reviews-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Google Rating"
+    },
+    {
+      "type": "text",
+      "id": "average_rating",
+      "label": "Average Rating",
+      "default": "5.0",
+      "info": "Enter your Google average rating (e.g., 5.0, 4.8)"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Number of Reviews",
+      "default": "103",
+      "info": "Total number of Google reviews"
+    },
+    {
+      "type": "url",
+      "id": "google_review_url",
+      "label": "Google Review URL",
+      "info": "Paste your Google review link here"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "reviewer_image",
+          "label": "Reviewer Photo",
+          "info": "Upload reviewer's profile photo"
+        },
+        {
+          "type": "text",
+          "id": "reviewer_name",
+          "label": "Reviewer Name",
+          "default": "John Doe"
+        },
+        {
+          "type": "range",
+          "id": "star_rating",
+          "label": "Star Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "review_text",
+          "label": "Review Text",
+          "default": "Great product! Highly recommended."
+        },
+        {
+          "type": "image_picker",
+          "id": "review_image",
+          "label": "Review Image (Optional)",
+          "info": "Upload an image to display with this review"
+        },
+        {
+          "type": "url",
+          "id": "review_url",
+          "label": "Review Link (Optional)",
+          "info": "Paste Google Maps review URL (e.g., https://maps.app.goo.gl/...)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Google Reviews",
+      "settings": {
+        "average_rating": "5.0",
+        "review_count": "103",
+        "google_review_url": "https://www.google.com/search?hl=en-MY&gl=my&q=Onthego+F%26B+Industry+Sdn.+Bhd.+(1581768-H),+Salak+Perdana+Business+Park,+18,+Jalan+Kenanga+1/6,+Bandar+Baru+Salak+Tinggi,+43900+Sepang,+Selangor&ludocid=4523328717653119589&lsig=AB86z5UyibttA6R9OYkXb3O-l3J7#lrd=0x31cdb3dea233856f:0x3ec61780ca099265,3"
+      },
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "reviewer_name": "Eiskhander Dollah",
+            "star_rating": 5,
+            "review_text": "Sangat sedap, berbaloi, texture halus dan protein tinggi"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "reviewer_name": "Sarah Ahmad",
+            "star_rating": 5,
+            "review_text": "Best protein powder I've ever tried! Great taste and quality."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "reviewer_name": "Michael Tan",
+            "star_rating": 5,
+            "review_text": "Excellent product, fast delivery, and great customer service!"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

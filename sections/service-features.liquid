@@ -1,0 +1,315 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .service-features__list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .service-features__item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    padding: 1rem 2rem;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    border-radius: var(--media-radius);
+  }
+
+  .service-features__icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .service-features__icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+
+  .service-features__progress {
+    display: block !important;
+    width: 100%;
+    max-width: 200px;
+    height: 8px;
+    background-color: #e5e5e5;
+    margin: 2rem auto 0;
+    position: relative;
+    border-radius: 4px;
+    overflow: visible;
+    border: 1px solid #ccc;
+  }
+
+  .service-features__progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: #000000 !important;
+    width: 33%;
+    transition: width 0.2s ease-out;
+    border-radius: 4px;
+    z-index: 10;
+  }
+
+  @media screen and (min-width: 750px) {
+    .service-features__list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      flex-wrap: wrap;
+      overflow-x: visible;
+      gap: 1.5rem;
+    }
+
+    .service-features__item {
+      flex: 1;
+      width: auto;
+      scroll-snap-align: unset;
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      gap: 0.5rem;
+    }
+
+    .service-features__icon {
+      margin-bottom: 0.5rem;
+    }
+
+    .service-features__text {
+      white-space: nowrap;
+    }
+
+    .service-features__text strong {
+      white-space: nowrap;
+      display: inline;
+    }
+  }
+{%- endstyle -%}
+
+<style>
+  .sf-progress-{{ section.id }} {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    height: 4px !important;
+    background-color: #e5e5e5 !important;
+    margin: 10px auto 0 !important;
+    position: relative !important;
+    border-radius: 4px !important;
+  }
+  .sf-progress-bar-{{ section.id }} {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100% !important;
+    background-color: #000 !important;
+    width: 25%;
+    border-radius: 4px !important;
+    z-index: 10 !important;
+    transition: width 0.3s ease-out !important;
+  }
+  @media screen and (min-width: 750px) {
+    .sf-progress-{{ section.id }} {
+      display: none !important;
+    }
+  }
+</style>
+
+<div class="service-features section-{{ section.id }}-padding color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    <div class="service-features__wrapper">
+      <ul class="service-features__list" id="ServiceFeaturesList-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          <li class="service-features__item" {{ block.shopify_attributes }}>
+            <div class="service-features__icon">
+              {%- if block.settings.icon_svg != blank -%}
+                {{ block.settings.icon_svg }}
+              {%- endif -%}
+            </div>
+            {%- if block.settings.text != blank -%}
+              <div class="service-features__text rte">
+                {{ block.settings.text }}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+      <div class="sf-progress-{{ section.id }}" aria-hidden="true">
+        <div class="sf-progress-bar-{{ section.id }}" id="ServiceFeaturesProgress-{{ section.id }}"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    function initServiceFeatures() {
+      const list = document.getElementById('ServiceFeaturesList-{{ section.id }}');
+      const progressBar = document.getElementById('ServiceFeaturesProgress-{{ section.id }}');
+
+      if (!list || !progressBar) return;
+
+      const items = list.querySelectorAll('.service-features__item');
+      const totalItems = items.length || 4;
+
+      function updateProgress() {
+        const scrollLeft = list.scrollLeft;
+        const clientWidth = list.clientWidth; // Width of one item (100% of container)
+
+        // Calculate current slide index (0-based)
+        // Each item takes full width, so scrollLeft / clientWidth gives us the index
+        const currentIndex = Math.round(scrollLeft / clientWidth);
+
+        // Calculate percentage: (currentIndex + 1) / totalItems * 100
+        // So for 4 items: 25%, 50%, 75%, 100%
+        let percentage = ((currentIndex + 1) / totalItems) * 100;
+        percentage = Math.max(25, Math.min(percentage, 100));
+
+        progressBar.style.setProperty('width', percentage + '%', 'important');
+      }
+
+      // Use scroll event with passive option for better performance
+      list.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress);
+
+      // Initial call
+      setTimeout(updateProgress, 100);
+      updateProgress();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initServiceFeatures);
+    } else {
+      initServiceFeatures();
+    }
+
+    // Init on Theme Editor section re-load
+    document.addEventListener('shopify:section:load', function (event) {
+      if (event.detail.sectionId === '{{ section.id }}') {
+        initServiceFeatures();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Service Features",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "background-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon_svg",
+          "label": "Icon SVG",
+          "info": "Paste the SVG code here."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p><strong>Feature Title</strong><br/>Description text goes here.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Service Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon_svg": "<svg class=\"icon icon--icon-truck\" aria-hidden=\"true\" focusable=\"false\" role=\"presentation\" width=\"34\" height=\"25\" viewBox=\"0 0 34 25\"><path d=\"M18.5 2.633H2v14l2.667 2L5.5 20.5l-.833.133a2 2 0 0 1-1.2-.4l-2.667-2a2 2 0 0 1-.8-1.6v-14a2 2 0 0 1 2-2h16.5a2 2 0 0 1 2 2v18h-8.297v-2H18.5v-16Z\" fill=\"currentColor\"/><path d=\"M31 17v-3.938l-3.793-8.43H20.5v14H22v2h-3.5v-16a2 2 0 0 1 2-2h6.707a2 2 0 0 1 1.824 1.18l3.793 8.43c.116.257.176.537.176.82V17.5l-2-.5Z\" fill=\"currentColor\"/><path d=\"M31.923 18.633h-3.687C28 18 27.5 17 27.642 16.633h4.281a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-3.562l1.015-2h2.547v-1Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"m26.187 10.188-1.142-2.555H23.5v2.555h2.687ZM23 6.133a1 1 0 0 0-1 1v3.555a1 1 0 0 0 1 1h3.958a1 1 0 0 0 .913-1.408l-1.59-3.555a1 1 0 0 0-.912-.592H23ZM25.5 22.633a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm0 2a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8.5 22.633a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm0 2a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"20.133\" r=\"1.5\" fill=\"currentColor\"/><circle cx=\"25.5\" cy=\"20.133\" r=\"1.5\" fill=\"currentColor\"/></svg>",
+            "text": "<p><strong>INTERNATIONAL DELIVERY<br/></strong>2-7 Working days</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_svg": "<svg class=\"icon icon--icon-box\" aria-hidden=\"true\" focusable=\"false\" role=\"presentation\" width=\"29\" height=\"31\" viewBox=\"0 0 29 31\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M27 28.633V7.787l-4.306-5.154H6.306L2 7.787v20.846h25ZM.465 6.505A2 2 0 0 0 0 7.787v20.846a2 2 0 0 0 2 2h25a2 2 0 0 0 2-2V7.787a2 2 0 0 0-.465-1.282L24.229 1.35a2 2 0 0 0-1.535-.718H6.306a2 2 0 0 0-1.535.718L.465 6.505Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M28 7.633H1v-2h27v2Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M15 1.633v6h-2v-6h2ZM10 13.633a1 1 0 0 1 1-1h7a1 1 0 1 1 0 2h-7a1 1 0 0 1-1-1Z\" fill=\"currentColor\"/></svg>",
+            "text": "<p><strong>FAST ORDER PROCESSING<br/></strong>Packed & Shipped Daily</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_svg": "<svg class=\"icon icon--icon-box\" aria-hidden=\"true\" focusable=\"false\" role=\"presentation\" width=\"29\" height=\"31\" viewBox=\"0 0 29 31\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M27 28.633V7.787l-4.306-5.154H6.306L2 7.787v20.846h25ZM.465 6.505A2 2 0 0 0 0 7.787v20.846a2 2 0 0 0 2 2h25a2 2 0 0 0 2-2V7.787a2 2 0 0 0-.465-1.282L24.229 1.35a2 2 0 0 0-1.535-.718H6.306a2 2 0 0 0-1.535.718L.465 6.505Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M28 7.633H1v-2h27v2Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M15 1.633v6h-2v-6h2ZM10 13.633a1 1 0 0 1 1-1h7a1 1 0 1 1 0 2h-7a1 1 0 0 1-1-1Z\" fill=\"currentColor\"/></svg>",
+            "text": "<p><strong>RELIABLE DELIVERY<br/></strong>Trusted Courier Partners</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon_svg": "<svg class=\"icon icon--icon-cash\" aria-hidden=\"true\" focusable=\"false\" role=\"presentation\" width=\"37\" height=\"34\" viewBox=\"0 0 37 34\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M34 12.633H3v18.7h31v-18.7Zm-31-2a2 2 0 0 0-2 2v18.7a2 2 0 0 0 2 2h31a2 2 0 0 0 2-2v-18.7a2 2 0 0 0-2-2H3Z\" fill=\"currentColor\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M1 25.383h35v1.5H1v-1.5ZM1 28.383h35v1.5H1v-1.5ZM18.5 23.133a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11ZM32.357 15.266c.809.81 1.94 1.104 2.984.88l.315 1.466a4.747 4.747 0 0 1-4.36-1.285 4.746 4.746 0 0 1-1.289-4.342l1.468.31a3.247 3.247 0 0 0 .882 2.971ZM4.596 15.266a3.247 3.247 0 0 1-2.984.88l-.314 1.466a4.747 4.747 0 0 0 4.36-1.285 4.747 4.747 0 0 0 1.288-4.342l-1.468.31a3.247 3.247 0 0 1-.881 2.971Z\" fill=\"currentColor\"/></svg>",
+            "text": "<p><strong>100% SECURE PAYMENTS<br/></strong>Multiple payment options</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

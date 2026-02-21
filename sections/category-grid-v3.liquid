@@ -1,0 +1,166 @@
+{% comment %}
+  Category Grid Section
+  Displays a grid of category cards with images and titles
+{% endcomment %}
+
+<style>
+  .category-grid-section {
+    background-color: #ffffff;
+  }
+
+  .category-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 4px;
+  }
+
+  @media (min-width: 1024px) {
+    .category-grid-container {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+  }
+
+  .category-card {
+    position: relative;
+    display: block;
+    aspect-ratio: 9.6 / 14;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .category-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+
+  .category-card:hover .category-card-image {
+    transform: scale(1.05);
+  }
+
+  .category-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .category-card-overlay {
+      padding-bottom: 32px;
+    }
+  }
+
+  .category-card-title {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .category-card:hover .category-card-title {
+    background-color: #ffffff;
+    color: #000000;
+  }
+</style>
+
+<div class="category-grid-section">
+  <div class="category-grid-container">
+    {% for block in section.blocks %}
+      {% if block.type == 'category' %}
+        <a href="{{ block.settings.link }}" class="category-card">
+          <img 
+            src="{{ block.settings.image | img_url: '800x' }}" 
+            alt="{{ block.settings.title }}"
+            width="800"
+            height="1167"
+            class="category-card-image"
+            loading="lazy"
+          />
+          <div class="category-card-overlay">
+            <span class="category-card-title">
+              {{ block.settings.title }}
+            </span>
+          </div>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Category Grid",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category Title",
+          "default": "CATEGORY NAME"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Image",
+          "info": "Recommended aspect ratio: 9.6:14 (e.g., 800x1167px)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Category Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Grid",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "PRE-WORKOUT",
+            "link": "/collections/pre-workout"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "PROTEIN",
+            "link": "/collections/protein"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "LIFTING GEAR",
+            "link": "/collections/lifting-gear"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "APPAREL",
+            "link": "/collections/apparel"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

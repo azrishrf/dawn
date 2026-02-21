@@ -1,0 +1,179 @@
+{% comment %}
+  Cloth Collection Section
+  Displays a hero banner followed by a product grid with color options
+{% endcomment %}
+
+<section class="w-full">
+  <!-- Hero Image - Desktop -->
+  <div
+    class="relative w-full overflow-hidden hidden lg:block"
+    style="aspect-ratio: 2400 / 917;"
+  >
+    {% if section.settings.hero_image %}
+      <img 
+        src="{{ section.settings.hero_image | img_url: '2400x' }}" 
+        alt="{{ section.settings.hero_alt }}" 
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    {% endif %}
+    <div class="absolute inset-0 flex items-end justify-center pb-10 bg-black/20">
+      <a
+        href="{{ section.settings.hero_button_link }}"
+        class="inline-block text-sm bg-white text-black px-6 py-3 font-bold tracking-widest hover:bg-black hover:text-white transition-colors"
+      >
+        {{ section.settings.hero_button_text }}
+      </a>
+    </div>
+  </div>c
+
+  <!-- Hero Image - Mobile -->
+  <div
+    class="relative w-full overflow-hidden lg:hidden"
+    style="aspect-ratio: 1500 / 1650;"
+  >
+    {% if section.settings.mobile_hero_image %}
+      <img 
+        src="{{ section.settings.mobile_hero_image | img_url: '1500x' }}" 
+        alt="{{ section.settings.hero_alt }}" 
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    {% endif %}
+    <div class="absolute inset-0 flex items-end justify-center pb-10 bg-black/20">
+      <a
+        href="{{ section.settings.hero_button_link }}"
+        class="inline-block text-sm bg-white text-black px-6 py-3 font-bold tracking-widest hover:bg-black hover:text-white transition-colors"
+      >
+        {{ section.settings.hero_button_text }}
+      </a>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="py-16 px-4 lg:px-8 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-0">
+        <div class="flex lg:grid lg:grid-cols-4 gap-4 min-w-max lg:min-w-0">
+          {% assign collection = collections[section.settings.collection] %}
+          {% if collection.products.size > 0 %}
+            {% for product in collection.products %}
+              <div class="group w-[175px] lg:w-[280px] lg:w-auto flex-shrink-0">
+                <!-- Product Image with Badge -->
+                <div
+                  class="relative bg-gray-100 mb-4 overflow-hidden"
+                  style="aspect-ratio: 900 / 1200;"
+                >
+                  {% if product.tags contains 'new' or product.tags contains 'NEW' %}
+                    <div class="absolute top-0 right-0 px-2 py-2 text-xs font-bold z-10 bg-black text-white">
+                      NEW
+                    </div>
+                  {% elsif product.tags contains 'final-sale' or product.tags contains 'FINAL SALE' %}
+                    <div class="absolute top-0 right-0 px-2 py-2 text-xs font-bold z-10 bg-black text-white">
+                      FINAL SALE
+                    </div>
+                  {% endif %}
+                  <a href="{{ product.url }}">
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | img_url: '800x' }}"
+                        alt="{{ product.title }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    {% endif %}
+                  </a>
+                </div>
+
+                <!-- Product Info -->
+                <div class="text-center mb-3">
+                  <h3 class="text-md text-black tracking-wide font-medium mb-2 uppercase">
+                    {{ product.title }}
+                  </h3>
+                  <div class="flex items-center justify-center gap-2">
+                    {% if product.compare_at_price > product.price %}
+                      <span class="text-gray-500 line-through text-sm">
+                        {{ product.compare_at_price | money }}
+                      </span>
+                      <span class="font-semibold text-sm text-red-600">
+                        {{ product.price | money }}
+                      </span>
+                    {% else %}
+                      <span class="font-semibold text-sm text-gray-900">
+                        {{ product.price | money }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Color Swatches -->
+                {% if product.options contains 'Color' %}
+                  <div class="flex justify-center gap-2 mb-4">
+                    {% for variant in product.variants limit: 5 %}
+                      {% if variant.option1 %}
+                        <button
+                          class="w-5 h-5 rounded-full border-2 border-gray-300 hover:border-black transition-colors"
+                          style="background-color: {{ variant.option1 | handle }};"
+                          aria-label="Color {{ variant.option1 }}"
+                        ></button>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-center text-gray-500 col-span-4">No products found in this collection.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cloth Collection",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Desktop Hero Image",
+      "info": "Recommended size: 2400x917px"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_hero_image",
+      "label": "Mobile Hero Image",
+      "info": "Recommended size: 1500x1650px"
+    },
+    {
+      "type": "text",
+      "id": "hero_alt",
+      "label": "Hero Alt Text",
+      "default": "Collection Banner"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_text",
+      "label": "Hero Button Text",
+      "default": "SHOP COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "Hero Button Link"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Product Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cloth Collection"
+    }
+  ]
+}
+{% endschema %}

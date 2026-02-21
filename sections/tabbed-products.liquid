@@ -1,0 +1,688 @@
+{% comment %}
+  Tabbed Products Section
+  Displays products in tabs with horizontal scrolling on mobile
+{% endcomment %}
+
+<style>
+  .tabbed-products-section {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: #ffffff;
+    max-width: 1700px;
+    margin: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .tabbed-products-section {
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+  }
+
+  .tabs-container {
+    margin-bottom: 20px;
+  }
+
+  .tabs-wrapper {
+    display: flex;
+    gap: 0;
+  }
+
+  .tab-button {
+    padding: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Funnel Display', sans-serif;
+  }
+
+  @media (min-width: 1024px) {
+    .tab-button {
+      padding: 12px 24px;
+      font-size: 16px;
+    }
+  }
+
+  .tab-button.active {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .tab-button:not(.active):hover {
+    background-color: #f3f4f6;
+  }
+
+  .products-outer-container {
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+
+  @media (min-width: 1024px) {
+    .products-outer-container {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .products-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .products-grid {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0;
+    scroll-padding-left: 16px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .product-card:first-child {
+    margin-left: 16px;
+  }
+
+  .product-card:last-child {
+    margin-right: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      min-width: 0;
+      overflow-x: visible;
+      scroll-snap-type: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .product-card:first-child {
+      margin-left: 0;
+    }
+
+    .product-card:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .product-card {
+    width: 240px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 1024px) {
+    .product-card {
+      width: auto;
+    }
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    background-color: #f3f4f6;
+    margin-bottom: 12px;
+    overflow: hidden;
+    aspect-ratio: 2100 / 2800;
+    display: block;
+    text-decoration: none;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .product-info {
+    text-align: center;
+    margin-bottom: 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .product-title {
+    color: #1f2937;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    letter-spacing: 0.025em;
+  }
+
+  .product-price {
+    color: #374151;
+    margin: 0;
+  }
+
+  .price-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .price-compare {
+    color: #9ca3af;
+    font-size: 14px;
+    text-decoration: line-through;
+  }
+
+  .shop-now-button {
+    display: block;
+    width: 100%;
+    background-color: #000000;
+    color: #ffffff;
+    text-align: center;
+    padding: 12px 16px 12px 16px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    margin-top: auto;
+  }
+
+  .shop-now-button:hover {
+    background-color: #1f2937;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+</style>
+
+<section class="tabbed-products-section">
+  <div>
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-wrapper">
+        {% assign tab_index = 0 %}
+        {% for block in section.blocks %}
+          {% if block.type == 'tab' %}
+            <button
+              class="tab-button {% if tab_index == 0 %}active{% endif %}"
+              data-tab="tab-{{ block.id }}"
+              onclick="switchTab(event, 'tab-{{ block.id }}')"
+            >
+              {{ block.settings.tab_label }}
+            </button>
+            {% assign tab_index = tab_index | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tab Contents -->
+    {% assign content_index = 0 %}
+    {% for block in section.blocks %}
+      {% if block.type == 'tab' %}
+        <div id="tab-{{ block.id }}" class="tab-content {% if content_index == 0 %}active{% endif %}">
+          <div class="products-outer-container">
+            <div class="products-grid">
+              {% assign product_1 = block.settings.product_1 %}
+              {% assign product_2 = block.settings.product_2 %}
+              {% assign product_3 = block.settings.product_3 %}
+              {% assign product_4 = block.settings.product_4 %}
+              {% assign product_5 = block.settings.product_5 %}
+
+              {% comment %} Get specific variants if variant IDs are provided {% endcomment %}
+              {% if block.settings.product_1_variant_id != blank %}
+                {% assign variant_id_1 = block.settings.product_1_variant_id | plus: 0 %}
+                {% for variant in product_1.variants %}
+                  {% if variant.id == variant_id_1 %}
+                    {% assign variant_1 = variant %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% assign variant_1 = product_1.selected_or_first_available_variant %}
+              {% endif %}
+
+              {% if block.settings.product_2_variant_id != blank %}
+                {% assign variant_id_2 = block.settings.product_2_variant_id | plus: 0 %}
+                {% for variant in product_2.variants %}
+                  {% if variant.id == variant_id_2 %}
+                    {% assign variant_2 = variant %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% assign variant_2 = product_2.selected_or_first_available_variant %}
+              {% endif %}
+
+              {% if block.settings.product_3_variant_id != blank %}
+                {% assign variant_id_3 = block.settings.product_3_variant_id | plus: 0 %}
+                {% for variant in product_3.variants %}
+                  {% if variant.id == variant_id_3 %}
+                    {% assign variant_3 = variant %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% assign variant_3 = product_3.selected_or_first_available_variant %}
+              {% endif %}
+
+              {% if block.settings.product_4_variant_id != blank %}
+                {% assign variant_id_4 = block.settings.product_4_variant_id | plus: 0 %}
+                {% for variant in product_4.variants %}
+                  {% if variant.id == variant_id_4 %}
+                    {% assign variant_4 = variant %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% assign variant_4 = product_4.selected_or_first_available_variant %}
+              {% endif %}
+
+              {% if block.settings.product_5_variant_id != blank %}
+                {% assign variant_id_5 = block.settings.product_5_variant_id | plus: 0 %}
+                {% for variant in product_5.variants %}
+                  {% if variant.id == variant_id_5 %}
+                    {% assign variant_5 = variant %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {% assign variant_5 = product_5.selected_or_first_available_variant %}
+              {% endif %}
+
+              {% if product_1 != blank %}
+                <div class="product-card">
+                  <!-- Product Image -->
+                  <a href="{{ product_1.url }}?variant={{ variant_1.id }}" class="product-image-wrapper">
+                    {% if variant_1.featured_image %}
+                      <img
+                        src="{{ variant_1.featured_image | img_url: '800x' }}"
+                        alt="{{ variant_1.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% elsif product_1.featured_image %}
+                      <img
+                        src="{{ product_1.featured_image | img_url: '800x' }}"
+                        alt="{{ product_1.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <!-- Product Info -->
+                  <div class="product-info">
+                    <h3 class="product-title">
+                      {% if block.settings.product_1_custom_name != blank %}
+                        {{ block.settings.product_1_custom_name }}
+                      {% else %}
+                        {{ product_1.title -}}
+                        {%- if variant_1.title != 'Default Title' %} - {{ variant_1.title }}{% endif %}
+                      {% endif %}
+                    </h3>
+                    <div class="price-wrapper">
+                      <span class="product-price">RM {{ variant_1.price | money_without_currency }}</span>
+                      {% if variant_1.compare_at_price > variant_1.price %}
+                        <span class="price-compare">RM {{ variant_1.compare_at_price | money_without_currency }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Shop Now Button -->
+                  <a href="{{ product_1.url }}?variant={{ variant_1.id }}" class="shop-now-button"> SHOP NOW </a>
+                </div>
+              {% endif %}
+
+              {% if product_2 != blank %}
+                <div class="product-card">
+                  <!-- Product Image -->
+                  <a href="{{ product_2.url }}?variant={{ variant_2.id }}" class="product-image-wrapper">
+                    {% if variant_2.featured_image %}
+                      <img
+                        src="{{ variant_2.featured_image | img_url: '800x' }}"
+                        alt="{{ variant_2.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% elsif product_2.featured_image %}
+                      <img
+                        src="{{ product_2.featured_image | img_url: '800x' }}"
+                        alt="{{ product_2.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <!-- Product Info -->
+                  <div class="product-info">
+                    <h3 class="product-title">
+                      {% if block.settings.product_2_custom_name != blank %}
+                        {{ block.settings.product_2_custom_name }}
+                      {% else %}
+                        {{ product_2.title -}}
+                        {%- if variant_2.title != 'Default Title' %} - {{ variant_2.title }}{% endif %}
+                      {% endif %}
+                    </h3>
+                    <div class="price-wrapper">
+                      <span class="product-price">RM {{ variant_2.price | money_without_currency }}</span>
+                      {% if variant_2.compare_at_price > variant_2.price %}
+                        <span class="price-compare">RM {{ variant_2.compare_at_price | money_without_currency }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Shop Now Button -->
+                  <a href="{{ product_2.url }}?variant={{ variant_2.id }}" class="shop-now-button"> SHOP NOW </a>
+                </div>
+              {% endif %}
+
+              {% if product_3 != blank %}
+                <div class="product-card">
+                  <!-- Product Image -->
+                  <a href="{{ product_3.url }}?variant={{ variant_3.id }}" class="product-image-wrapper">
+                    {% if variant_3.featured_image %}
+                      <img
+                        src="{{ variant_3.featured_image | img_url: '800x' }}"
+                        alt="{{ variant_3.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% elsif product_3.featured_image %}
+                      <img
+                        src="{{ product_3.featured_image | img_url: '800x' }}"
+                        alt="{{ product_3.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <!-- Product Info -->
+                  <div class="product-info">
+                    <h3 class="product-title">
+                      {% if block.settings.product_3_custom_name != blank %}
+                        {{ block.settings.product_3_custom_name }}
+                      {% else %}
+                        {{ product_3.title -}}
+                        {%- if variant_3.title != 'Default Title' %} - {{ variant_3.title }}{% endif %}
+                      {% endif %}
+                    </h3>
+                    <div class="price-wrapper">
+                      <span class="product-price">RM {{ variant_3.price | money_without_currency }}</span>
+                      {% if variant_3.compare_at_price > variant_3.price %}
+                        <span class="price-compare">RM {{ variant_3.compare_at_price | money_without_currency }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Shop Now Button -->
+                  <a href="{{ product_3.url }}?variant={{ variant_3.id }}" class="shop-now-button"> SHOP NOW </a>
+                </div>
+              {% endif %}
+
+              {% if product_4 != blank %}
+                <div class="product-card">
+                  <!-- Product Image -->
+                  <a href="{{ product_4.url }}?variant={{ variant_4.id }}" class="product-image-wrapper">
+                    {% if variant_4.featured_image %}
+                      <img
+                        src="{{ variant_4.featured_image | img_url: '800x' }}"
+                        alt="{{ variant_4.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% elsif product_4.featured_image %}
+                      <img
+                        src="{{ product_4.featured_image | img_url: '800x' }}"
+                        alt="{{ product_4.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <!-- Product Info -->
+                  <div class="product-info">
+                    <h3 class="product-title">
+                      {% if block.settings.product_4_custom_name != blank %}
+                        {{ block.settings.product_4_custom_name }}
+                      {% else %}
+                        {{ product_4.title -}}
+                        {%- if variant_4.title != 'Default Title' %} - {{ variant_4.title }}{% endif %}
+                      {% endif %}
+                    </h3>
+                    <div class="price-wrapper">
+                      <span class="product-price">RM {{ variant_4.price | money_without_currency }}</span>
+                      {% if variant_4.compare_at_price > variant_4.price %}
+                        <span class="price-compare">RM {{ variant_4.compare_at_price | money_without_currency }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Shop Now Button -->
+                  <a href="{{ product_4.url }}?variant={{ variant_4.id }}" class="shop-now-button"> SHOP NOW </a>
+                </div>
+              {% endif %}
+
+              {% if product_5 != blank %}
+                <div class="product-card">
+                  <!-- Product Image -->
+                  <a href="{{ product_5.url }}?variant={{ variant_5.id }}" class="product-image-wrapper">
+                    {% if variant_5.featured_image %}
+                      <img
+                        src="{{ variant_5.featured_image | img_url: '800x' }}"
+                        alt="{{ variant_5.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% elsif product_5.featured_image %}
+                      <img
+                        src="{{ product_5.featured_image | img_url: '800x' }}"
+                        alt="{{ product_5.featured_image.alt | escape }}"
+                        width="800"
+                        height="1067"
+                        class="product-image"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <!-- Product Info -->
+                  <div class="product-info">
+                    <h3 class="product-title">
+                      {% if block.settings.product_5_custom_name != blank %}
+                        {{ block.settings.product_5_custom_name }}
+                      {% else %}
+                        {{ product_5.title -}}
+                        {%- if variant_5.title != 'Default Title' %} - {{ variant_5.title }}{% endif %}
+                      {% endif %}
+                    </h3>
+                    <div class="price-wrapper">
+                      <span class="product-price">RM {{ variant_5.price | money_without_currency }}</span>
+                      {% if variant_5.compare_at_price > variant_5.price %}
+                        <span class="price-compare">RM {{ variant_5.compare_at_price | money_without_currency }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Shop Now Button -->
+                  <a href="{{ product_5.url }}?variant={{ variant_5.id }}" class="shop-now-button"> SHOP NOW </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% assign content_index = content_index | plus: 1 %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  function switchTab(event, tabId) {
+    // Remove active class from all tabs and contents
+    var tabs = document.querySelectorAll('.tab-button');
+    var contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(function (tab) {
+      tab.classList.remove('active');
+    });
+
+    contents.forEach(function (content) {
+      content.classList.remove('active');
+    });
+
+    // Add active class to clicked tab and corresponding content
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Tabbed Products",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Tab Label",
+          "default": "TAB NAME"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "Product 1"
+        },
+        {
+          "type": "text",
+          "id": "product_1_custom_name",
+          "label": "Product 1 Custom Name",
+          "info": "Optional: Enter a custom name to display. Leave blank to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "product_1_variant_id",
+          "label": "Product 1 Variant ID",
+          "info": "Optional: Enter a specific variant ID to display that variant. Leave blank to show the first available variant."
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "Product 2"
+        },
+        {
+          "type": "text",
+          "id": "product_2_custom_name",
+          "label": "Product 2 Custom Name",
+          "info": "Optional: Enter a custom name to display. Leave blank to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "product_2_variant_id",
+          "label": "Product 2 Variant ID",
+          "info": "Optional: Enter a specific variant ID to display that variant. Leave blank to show the first available variant."
+        },
+        {
+          "type": "product",
+          "id": "product_3",
+          "label": "Product 3"
+        },
+        {
+          "type": "text",
+          "id": "product_3_custom_name",
+          "label": "Product 3 Custom Name",
+          "info": "Optional: Enter a custom name to display. Leave blank to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "product_3_variant_id",
+          "label": "Product 3 Variant ID",
+          "info": "Optional: Enter a specific variant ID to display that variant. Leave blank to show the first available variant."
+        },
+        {
+          "type": "product",
+          "id": "product_4",
+          "label": "Product 4"
+        },
+        {
+          "type": "text",
+          "id": "product_4_custom_name",
+          "label": "Product 4 Custom Name",
+          "info": "Optional: Enter a custom name to display. Leave blank to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "product_4_variant_id",
+          "label": "Product 4 Variant ID",
+          "info": "Optional: Enter a specific variant ID to display that variant. Leave blank to show the first available variant."
+        },
+        {
+          "type": "product",
+          "id": "product_5",
+          "label": "Product 5"
+        },
+        {
+          "type": "text",
+          "id": "product_5_custom_name",
+          "label": "Product 5 Custom Name",
+          "info": "Optional: Enter a custom name to display. Leave blank to use the product title."
+        },
+        {
+          "type": "text",
+          "id": "product_5_variant_id",
+          "label": "Product 5 Variant ID",
+          "info": "Optional: Enter a specific variant ID to display that variant. Leave blank to show the first available variant."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabbed Products"
+    }
+  ]
+}
+{% endschema %}

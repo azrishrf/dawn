@@ -1,0 +1,324 @@
+<!-- Product Gallery Section -->
+<div class="product-gallery">
+  <div class="gallery-sticky-container">
+    <!-- Mobile/Tablet View - Swipeable -->
+    <div class="gallery-mobile">
+      <div class="gallery-mobile-wrapper">
+        <!-- Swipeable Container -->
+        <div class="gallery-scroll" data-gallery-scroll>
+          <div class="gallery-images-wrapper">
+            {% for image in product.images %}
+              <div class="gallery-image-item">
+                <img
+                  src="{{ image | image_url: width: 800 }}"
+                  alt="{{ product.title }} - {{ forloop.index }}"
+                  class="gallery-image"
+                  loading="lazy"
+                  width="{{ image.width }}"
+                  height="{{ image.height }}"
+                >
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Pagination Dots -->
+        <div class="gallery-dots" data-gallery-dots>
+          {% for image in product.images %}
+            <button
+              data-dot-index="{{ forloop.index0 }}"
+              class="gallery-dot"
+              aria-label="View image {{ forloop.index }}"
+            ></button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop View - Thumbnails on Left -->
+    <div class="gallery-desktop">
+      <!-- Thumbnails - Left Side -->
+      <div class="gallery-thumbnails">
+        {% for image in product.images %}
+          <button
+            data-thumbnail="{{ forloop.index0 }}"
+            class="gallery-thumbnail"
+          >
+            <img
+              src="{{ image | image_url: width: 200 }}"
+              alt="{{ product.title }} - Thumbnail {{ forloop.index }}"
+              class="thumbnail-image"
+              loading="lazy"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            >
+          </button>
+        {% endfor %}
+      </div>
+
+      <!-- Main Image - Right Side -->
+      <div class="gallery-main-image-container">
+        <img
+          data-main-image
+          src="{{ product.featured_image | image_url: width: 1200 }}"
+          alt="{{ product.title }}"
+          class="gallery-main-image"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-gallery {
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .product-gallery {
+      width: 50%;
+    }
+  }
+
+  .gallery-sticky-container {
+    position: sticky;
+    top: 16px;
+  }
+
+  /* Mobile View */
+  .gallery-mobile {
+    display: block;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery-mobile {
+      display: none;
+    }
+  }
+
+  .gallery-mobile-wrapper {
+    position: relative;
+  }
+
+  .gallery-scroll {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 -16px;
+  }
+
+  .gallery-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .gallery-images-wrapper {
+    display: flex;
+    gap: 4px;
+    padding: 0 10%;
+  }
+
+  .gallery-image-item {
+    width: 90%;
+    flex-shrink: 0;
+    background-color: #f9fafb;
+    scroll-snap-align: center;
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .gallery-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+  }
+
+  .gallery-dot.active {
+    background-color: #000;
+  }
+
+  /* Desktop View */
+  .gallery-desktop {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery-desktop {
+      display: flex;
+      gap: 16px;
+    }
+  }
+
+  .gallery-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    max-height: 600px;
+  }
+
+  .gallery-thumbnails::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-thumbnail {
+    width: 80px;
+    height: 96px;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.3s ease;
+  }
+
+  .gallery-thumbnail:hover {
+    border-color: #d1d5db;
+  }
+
+  .gallery-thumbnail.active {
+    border-color: #000;
+  }
+
+  .thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .gallery-main-image-container {
+    flex: 1;
+    aspect-ratio: 4/5;
+    background-color: #f9fafb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Mobile gallery scroll handling
+    const scrollContainer = document.querySelector('[data-gallery-scroll]');
+    const dots = document.querySelectorAll('[data-dot-index]');
+
+    if (scrollContainer && dots.length > 0) {
+      let currentIndex = 0;
+
+      // Update dots on scroll
+      scrollContainer.addEventListener('scroll', function () {
+        const scrollLeft = scrollContainer.scrollLeft;
+        const firstItem = scrollContainer.querySelector('.gallery-image-item');
+
+        if (firstItem) {
+          const itemWidth = firstItem.offsetWidth;
+          const gap = 4;
+          const stride = itemWidth + gap;
+          const newIndex = Math.round(scrollLeft / stride);
+
+          if (newIndex !== currentIndex && newIndex >= 0 && newIndex < dots.length) {
+            currentIndex = newIndex;
+            updateDots(newIndex);
+          }
+        }
+      });
+
+      // Click on dots
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', function () {
+          const firstItem = scrollContainer.querySelector('.gallery-image-item');
+          if (firstItem) {
+            const gap = 4;
+            const stride = firstItem.offsetWidth + gap;
+            scrollContainer.scrollTo({
+              left: stride * index,
+              behavior: 'smooth',
+            });
+            currentIndex = index;
+            updateDots(index);
+          }
+        });
+      });
+
+      function updateDots(index) {
+        dots.forEach((dot, i) => {
+          if (i === index) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      // Initialize first dot as active
+      updateDots(0);
+    }
+
+    // Desktop thumbnail click handling
+    const thumbnails = document.querySelectorAll('[data-thumbnail]');
+    const mainImage = document.querySelector('[data-main-image]');
+
+    if (thumbnails.length > 0 && mainImage) {
+      thumbnails.forEach((thumbnail, index) => {
+        thumbnail.addEventListener('click', function () {
+          const imageUrl = this.querySelector('img').src.replace('200x', '1200x');
+          mainImage.src = imageUrl;
+
+          // Update active thumbnail
+          thumbnails.forEach((t) => t.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Set first thumbnail as active
+      if (thumbnails[0]) {
+        thumbnails[0].classList.add('active');
+      }
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Gallery",
+  "tag": "section",
+  "class": "product-gallery-section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Product Gallery"
+    }
+  ]
+}
+{% endschema %}
