@@ -1449,6 +1449,111 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Complete Stack (Custom Drawer)"
+      },
+      {
+        "type": "select",
+        "id": "cart_extras_layout",
+        "label": "Layout Style",
+        "options": [
+          {
+            "value": "grid",
+            "label": "Horizontal Scroll (Grid)"
+          },
+          {
+            "value": "column",
+            "label": "Vertical Stack (Column)"
+          }
+        ],
+        "default": "grid"
+      },
+      {
+        "type": "product",
+        "id": "cart_extra_product_1",
+        "label": "Extra Product 1"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_extra_use_variant_1",
+        "label": "Open Variant Selector overlay?",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cart_extra_allowed_variants_1",
+        "label": "Allowed Variants (Comma separated)",
+        "info": "Leave blank to show all. E.g., 'Medium, Large'"
+      },
+      {
+        "type": "product",
+        "id": "cart_extra_product_2",
+        "label": "Extra Product 2"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_extra_use_variant_2",
+        "label": "Open Variant Selector overlay?",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cart_extra_allowed_variants_2",
+        "label": "Allowed Variants (Comma separated)",
+        "info": "Leave blank to show all. E.g., 'Medium, Large'"
+      },
+      {
+        "type": "product",
+        "id": "cart_extra_product_3",
+        "label": "Extra Product 3"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_extra_use_variant_3",
+        "label": "Open Variant Selector overlay?",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cart_extra_allowed_variants_3",
+        "label": "Allowed Variants (Comma separated)",
+        "info": "Leave blank to show all. E.g., 'Medium, Large'"
+      },
+      {
+        "type": "product",
+        "id": "cart_extra_product_4",
+        "label": "Extra Product 4"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_extra_use_variant_4",
+        "label": "Open Variant Selector overlay?",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cart_extra_allowed_variants_4",
+        "label": "Allowed Variants (Comma separated)",
+        "info": "Leave blank to show all. E.g., 'Medium, Large'"
+      },
+      {
+        "type": "product",
+        "id": "cart_extra_product_5",
+        "label": "Extra Product 5"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_extra_use_variant_5",
+        "label": "Open Variant Selector overlay?",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cart_extra_allowed_variants_5",
+        "label": "Allowed Variants (Comma separated)",
+        "info": "Leave blank to show all. E.g., 'Medium, Large'"
       }
     ]
   }

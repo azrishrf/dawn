@@ -131,6 +131,7 @@
                   {% if single_variant %}
                     <p class="pack-price">RM {{ single_variant.price | money_without_currency }}</p>
                     <div class="pack-freebie">100 SERVINGS</div>
+                    <p class="pack-save">SAVE RM10</p>
                   {% else %}
                     <p class="pack-price">Not Available</p>
                   {% endif %}
@@ -138,14 +139,14 @@
               </div>
 
               <!-- Best Value Pack (500g) -->
-              {% assign best_value_variant = product.variants | where: 'option1', '500g + 100g' | first %}
+              {% assign best_value_variant = product.variants | where: 'option1', '500g + FREE 100g' | first %}
               <div
                 class="pack-option-card {% if best_value_variant.available == false %}pack-option-disabled{% endif %}"
                 data-pack-card
                 data-pack-type="best-value"
               >
                 <span class="pack-badge">BEST VALUE</span>
-                <p class="pack-label">500g + 100g</p>
+                <p class="pack-label">500g + FREE 100g</p>
                 <div class="pack-image-wrapper">
                   {% assign best_value_img_index = section.settings.best_value_image_index | minus: 1 %}
                   {% if product.images[best_value_img_index] %}
@@ -166,7 +167,7 @@
                   {% if best_value_variant %}
                     <p class="pack-price">RM {{ best_value_variant.price | money_without_currency }}</p>
                     <div class="pack-freebie">120 SERVINGS</div>
-                    <p class="pack-save">SAVE RM10</p>
+                    <p class="pack-save">SAVE RM20</p>
                   {% else %}
                     <p class="pack-price">Not Available</p>
                   {% endif %}
@@ -225,33 +226,6 @@
           {{ product.description }}
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Cart Drawer -->
-<div class="cart-drawer-overlay" id="cartDrawer">
-  <div class="cart-drawer-backdrop" onclick="closeCartDrawer()"></div>
-  <div class="cart-drawer">
-    <div class="cart-drawer-header">
-      <h2 class="cart-drawer-title">YOUR CART</h2>
-      <button onclick="closeCartDrawer()" class="cart-drawer-close">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="cart-drawer-items" id="cartDrawerItems">
-      <!-- Cart items will be dynamically inserted here -->
-    </div>
-    <div class="cart-drawer-footer">
-      <div class="cart-drawer-total">
-        <span>SUBTOTAL:</span>
-        <span id="cartDrawerTotal">RM 0.00</span>
-      </div>
-      <a href="/cart" class="cart-drawer-button cart-drawer-view">VIEW CART</a>
-      <a href="/checkout" class="cart-drawer-button cart-drawer-checkout">CHECKOUT</a>
     </div>
   </div>
 </div>
@@ -514,11 +488,11 @@
     position: relative;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
-    padding: 16px 10px 12px 10px;
+    padding: 16px 8px 12px 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     background: #f0f0f0;
-    max-width: 140px;
+    max-width: 135px;
     flex: 1;
   }
 
@@ -804,187 +778,6 @@
   .product-description ul {
     padding-left: 20px;
   }
-
-  /* Cart Drawer Styles */
-  .cart-drawer-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .cart-drawer-overlay.active {
-    pointer-events: auto;
-    opacity: 1;
-  }
-
-  .cart-drawer-backdrop {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-  }
-
-  .cart-drawer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 400px;
-    max-width: 90vw;
-    background-color: #fff;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .cart-drawer-overlay.active .cart-drawer {
-    transform: translateX(0);
-  }
-
-  .cart-drawer-header {
-    padding: 24px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, #f9fafb, #fff);
-  }
-
-  .cart-drawer-title {
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 0.1em;
-  }
-
-  .cart-drawer-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    color: black;
-  }
-
-  .cart-drawer-close:hover {
-    background-color: #f3f4f6;
-  }
-
-  .cart-drawer-items {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-  }
-
-  .cart-drawer-item {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-
-  .cart-drawer-item:last-child {
-    border-bottom: none;
-  }
-
-  .cart-item-image {
-    width: 80px;
-    height: 100px;
-    object-fit: cover;
-    background-color: #f9fafb;
-    flex-shrink: 0;
-  }
-
-  .cart-item-details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .cart-item-title {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-
-  .cart-item-variant {
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .cart-item-quantity {
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .cart-item-price {
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .cart-drawer-empty {
-    text-align: center;
-    padding: 48px 24px;
-    color: #6b7280;
-  }
-
-  .cart-drawer-footer {
-    padding: 24px;
-    border-top: 2px solid #e5e7eb;
-    background-color: #f9fafb;
-  }
-
-  .cart-drawer-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 16px;
-  }
-
-  .cart-drawer-button {
-    display: block;
-    width: 100%;
-    padding: 16px;
-    text-align: center;
-    font-weight: bold;
-    letter-spacing: 0.1em;
-    font-size: 14px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    margin-bottom: 12px;
-  }
-
-  .cart-drawer-button:last-child {
-    margin-bottom: 0;
-  }
-
-  .cart-drawer-view {
-    background-color: #fff;
-    color: #000;
-    border: 2px solid #000;
-  }
-
-  .cart-drawer-view:hover {
-    background-color: #f3f4f6;
-  }
-
-  .cart-drawer-checkout {
-    background-color: #000;
-    color: #fff;
-  }
-
-  .cart-drawer-checkout:hover {
-    background-color: #1f2937;
-  }
 </style>
 
 <script>
@@ -1087,29 +880,29 @@
     packCards.forEach((card) => {
       card.addEventListener('click', function () {
         if (this.classList.contains('pack-option-disabled')) return;
-        
+
         const packType = this.dataset.packType;
         console.log('Pack selected:', packType); // Debug log
-        
+
         // Update active state
         packCards.forEach((c) => c.classList.remove('active'));
         this.classList.add('active');
-        
+
         selectedPackType = packType;
-        
+
         // Single Pack (500g) - no weight selection needed
         if (packType === 'single') {
           // Hide weight container (not needed)
           if (weightContainer) weightContainer.style.display = 'none';
-          
+
           // Find the 500g single variant
           const allVariants = {{ product.variants | json }};
           const singleVariant = allVariants.find(v => v.option1.trim() === '500g');
-          
+
           if (singleVariant && variantInput) {
             console.log('Single Variant Found:', singleVariant.id); // Debug log
             variantInput.value = singleVariant.id;
-            
+
             if (priceDisplay) {
               const price = parseFloat(singleVariant.price) / 100;
               priceDisplay.textContent = 'RM ' + price.toFixed(2);
@@ -1126,7 +919,7 @@
                 comparePriceDisplay.style.display = 'none';
               }
             }
-            
+
             if (addToCartButton) {
               const btnText = addToCartButton.querySelector('.btn-text');
               if (singleVariant.available) {
@@ -1137,7 +930,7 @@
                 if (btnText) btnText.textContent = 'SOLD OUT';
               }
             }
-            
+
             if (singleVariant.featured_image) {
               const mainImage = document.querySelector('[data-main-image]');
               if (mainImage) mainImage.src = singleVariant.featured_image.src;
@@ -1145,33 +938,33 @@
           } else {
              console.warn('Single variant (500g) not found!');
           }
-          
+
         } else if (packType === 'best-value') {
           // Best Value - hide weight selection
           if (weightContainer) weightContainer.style.display = 'none';
-          
+
           // Find the 500g variant safely
           const allVariants = {{ product.variants | json }};
           const bestValueVariant = allVariants.find(v => {
-            // Trim whitespace to ensure exact match matches "500g + 100g"
-            return v.option1 && v.option1.trim() === '500g + 100g';
+            // Trim whitespace to ensure exact match matches "500g + FREE 100g"
+            return v.option1 && v.option1.trim() === '500g + FREE 100g';
           });
-          
+
           if (bestValueVariant) {
              console.log('Best Value Variant Found:', bestValueVariant.id);
-             
+
              if (variantInput) {
                variantInput.value = bestValueVariant.id;
              } else {
                console.error('Variant Input not found in DOM!');
              }
-            
+
             // Update price
             if (priceDisplay) {
               const price = parseFloat(bestValueVariant.price) / 100;
               priceDisplay.textContent = 'RM ' + price.toFixed(2);
             }
-            
+
             // Update compare price
             const comparePriceDisplay = document.querySelector('[data-compare-price]');
             if (comparePriceDisplay && bestValueVariant.compare_at_price) {
@@ -1183,7 +976,7 @@
                 comparePriceDisplay.style.display = 'none';
               }
             }
-            
+
             // Enable add to cart
             if (addToCartButton) {
               const btnText = addToCartButton.querySelector('.btn-text');
@@ -1195,7 +988,7 @@
                 if (btnText) btnText.textContent = 'SOLD OUT';
               }
             }
-            
+
             // Update main image if variant has featured image
             if (bestValueVariant.featured_image) {
               const mainImage = document.querySelector('[data-main-image]');
@@ -1204,7 +997,7 @@
               }
             }
           } else {
-            console.error('Best Value (500g + 100g) variant NOT found in product data:', allVariants);
+            console.error('Best Value (500g + FREE 100g) variant NOT found in product data:', allVariants);
           }
         }
       });
@@ -1228,12 +1021,12 @@
       const isAvailable = button.dataset.variantAvailable === 'true';
 
       variantInput.value = variantId;
-      
+
       if (priceDisplay) {
         const price = parseFloat(variantPrice) / 100;
         priceDisplay.textContent = 'RM ' + price.toFixed(2);
       }
-      
+
       // Update compare at price if it exists
       const comparePrice = button.dataset.variantComparePrice;
       const comparePriceDisplay = document.querySelector('[data-compare-price]');
@@ -1272,13 +1065,13 @@
         if (scrollContainer) {
           const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
           let matchingIndex = 0;
-          
+
           galleryImages.forEach((img, index) => {
             if (img.src.includes(variantImage.split('/').pop().split('?')[0])) {
               matchingIndex = index;
             }
           });
-          
+
           const firstItem = scrollContainer.querySelector('.gallery-image-item');
           if (firstItem) {
             const itemWidth = firstItem.offsetWidth;
@@ -1288,7 +1081,7 @@
             scrollContainer.scrollTo({ left: scrollPosition, behavior: 'smooth' });
           }
         }
-        
+
         // Update desktop thumbnails
         const thumbnails = document.querySelectorAll('[data-thumbnail]');
         if (thumbnails.length > 0) {
@@ -1307,15 +1100,15 @@
     const urlParams = new URLSearchParams(window.location.search);
     const urlVariantId = urlParams.get('variant');
     let variantAutoSelected = false;
-    
+
     if (urlVariantId) {
       const allVariants = {{ product.variants | json }};
       const urlVariant = allVariants.find(v => v.id.toString() === urlVariantId);
-      
+
       if (urlVariant) {
         const weight = urlVariant.option1;
-        
-        if (weight === '500g + 100g') {
+
+        if (weight === '500g + FREE 100g') {
           // Select Best Value pack
           const bestValueCard = document.querySelector('[data-pack-card][data-pack-type="best-value"]');
           if (bestValueCard && !bestValueCard.classList.contains('pack-option-disabled')) {
@@ -1353,21 +1146,21 @@
         }
       }
     }
-    
+
     // Initialize: Select single pack by default if no variant was auto-selected
     if (!variantAutoSelected) {
       const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
       if (singlePackCard && !singlePackCard.classList.contains('pack-option-disabled')) {
         singlePackCard.classList.add('active');
         selectedPackType = 'single';
-        
+
         // Hide weight container (Single is now 500g only, no weight selection needed)
         if (weightContainer) weightContainer.style.display = 'none';
-        
+
         // Auto-select the 500g single variant
         const allVariants = {{ product.variants | json }};
         const singleVariant = allVariants.find(v => v.option1 === '500g');
-        
+
         if (singleVariant) {
           if (variantInput) variantInput.value = singleVariant.id;
           if (priceDisplay) {
@@ -1435,7 +1228,7 @@
         if (response.ok) {
           const data = await response.json();
           console.log('Added to cart:', data);
-          
+
           // Open cart drawer
           openCartDrawer();
           updateCartDrawer();
@@ -1452,53 +1245,6 @@
       }
     });
   });
-
-  // Cart Drawer Functions
-  function openCartDrawer() {
-    document.getElementById('cartDrawer').classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-  
-  function closeCartDrawer() {
-    document.getElementById('cartDrawer').classList.remove('active');
-    document.body.style.overflow = '';
-  }
-  
-  async function updateCartDrawer() {
-    try {
-      const response = await fetch('/cart.js');
-      const cart = await response.json();
-      
-      const itemsContainer = document.getElementById('cartDrawerItems');
-      const totalElement = document.getElementById('cartDrawerTotal');
-      
-      if (cart.items.length === 0) {
-        itemsContainer.innerHTML = '<div class="cart-drawer-empty">Your cart is empty</div>';
-      } else {
-        itemsContainer.innerHTML = cart.items.map(item => `
-          <div class="cart-drawer-item">
-            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
-            <div class="cart-item-details">
-              <div class="cart-item-title">${item.product_title}</div>
-              <div class="cart-item-variant">${item.variant_title}</div>
-              <div class="cart-item-quantity">Qty: ${item.quantity}</div>
-              <div class="cart-item-price">RM ${(item.line_price / 100).toFixed(2)}</div>
-            </div>
-          </div>
-        `).join('');
-      }
-      
-      totalElement.textContent = `RM ${(cart.total_price / 100).toFixed(2)}`;
-      
-      // Update header cart count
-      const cartCountElement = document.getElementById('cartCount');
-      if (cartCountElement) {
-        cartCountElement.textContent = cart.item_count;
-      }
-    } catch (error) {
-      console.error('Error updating cart drawer:', error);
-    }
-  }
 </script>
 
 {% schema %}

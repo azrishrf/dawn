@@ -288,33 +288,6 @@
   </div>
 </div>
 
-<!-- Cart Drawer -->
-<div class="cart-drawer-overlay" id="cartDrawer">
-  <div class="cart-drawer-backdrop" onclick="closeCartDrawer()"></div>
-  <div class="cart-drawer">
-    <div class="cart-drawer-header">
-      <h2 class="cart-drawer-title">YOUR CART</h2>
-      <button onclick="closeCartDrawer()" class="cart-drawer-close">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="cart-drawer-items" id="cartDrawerItems">
-      <!-- Cart items will be dynamically inserted here -->
-    </div>
-    <div class="cart-drawer-footer">
-      <div class="cart-drawer-total">
-        <span>SUBTOTAL:</span>
-        <span id="cartDrawerTotal">RM 0.00</span>
-      </div>
-      <a href="/cart" class="cart-drawer-button cart-drawer-view">VIEW CART</a>
-      <a href="/checkout" class="cart-drawer-button cart-drawer-checkout">CHECKOUT</a>
-    </div>
-  </div>
-</div>
-
 <style>
   .product-main-section {
     background-color: #fff;
@@ -862,188 +835,6 @@
   .product-description ul {
     padding-left: 20px;
   }
-
-  /* Cart Drawer Styles */
-  .cart-drawer-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .cart-drawer-overlay.active {
-    pointer-events: auto;
-    opacity: 1;
-  }
-
-  .cart-drawer-backdrop {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-  }
-
-  .cart-drawer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 400px;
-    max-width: 90vw;
-    background-color: #fff;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .cart-drawer-overlay.active .cart-drawer {
-    transform: translateX(0);
-  }
-
-  .cart-drawer-header {
-    padding: 10px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, #f9fafb, #fff);
-  }
-
-  .cart-drawer-title {
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 0.1em;
-    margin: 0;
-  }
-
-  .cart-drawer-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    color: black;
-  }
-
-  .cart-drawer-close:hover {
-    background-color: #f3f4f6;
-  }
-
-  .cart-drawer-items {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-  }
-
-  .cart-drawer-item {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-
-  .cart-drawer-item:last-child {
-    border-bottom: none;
-  }
-
-  .cart-item-image {
-    width: 80px;
-    height: 100px;
-    object-fit: cover;
-    background-color: #f9fafb;
-    flex-shrink: 0;
-  }
-
-  .cart-item-details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .cart-item-title {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-
-  .cart-item-variant {
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .cart-item-quantity {
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .cart-item-price {
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .cart-drawer-empty {
-    text-align: center;
-    padding: 48px 24px;
-    color: #6b7280;
-  }
-
-  .cart-drawer-footer {
-    padding: 24px;
-    border-top: 2px solid #e5e7eb;
-    background-color: #f9fafb;
-  }
-
-  .cart-drawer-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 16px;
-  }
-
-  .cart-drawer-button {
-    display: block;
-    width: 100%;
-    padding: 16px;
-    text-align: center;
-    font-weight: bold;
-    letter-spacing: 0.1em;
-    font-size: 14px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    margin-bottom: 12px;
-  }
-
-  .cart-drawer-button:last-child {
-    margin-bottom: 0;
-  }
-
-  .cart-drawer-view {
-    background-color: #fff;
-    color: #000;
-    border: 2px solid #000;
-  }
-
-  .cart-drawer-view:hover {
-    background-color: #f3f4f6;
-  }
-
-  .cart-drawer-checkout {
-    background-color: #000;
-    color: #fff;
-  }
-
-  .cart-drawer-checkout:hover {
-    background-color: #1f2937;
-  }
 </style>
 
 <script>
@@ -1146,39 +937,39 @@
     packCards.forEach((card) => {
       card.addEventListener('click', function () {
         const packType = this.dataset.packType;
-        
+
         // Update active state
         packCards.forEach((c) => c.classList.remove('active'));
         this.classList.add('active');
-        
+
         selectedPackType = packType;
         selectedFlavor = null; // Reset flavor selection
-        
+
         // Show/hide flavor selection based on pack type
         if (packType === 'single') {
           flavorContainer.style.display = 'block';
-          
+
           // Reset flavor display
           if (flavorDisplay) {
             flavorDisplay.textContent = 'Please select a flavor';
           }
-          
+
           // Reset all flavor buttons
           flavorButtons.forEach((btn) => {
             btn.classList.remove('active');
           });
-          
+
           // Update price to show the first available single variant price
           const allVariants = {{ product.variants | json }};
           const firstSingleVariant = allVariants.find(v => {
             const title = v.title.toLowerCase();
             return title !== 'all flavours set' && v.available;
           });
-          
+
           if (firstSingleVariant && priceDisplay) {
             const price = parseFloat(firstSingleVariant.price) / 100;
             priceDisplay.textContent = 'RM ' + price.toFixed(2);
-            
+
             // Update compare at price if it exists
             const comparePrice = firstSingleVariant.compare_at_price;
             const comparePriceDisplay = document.querySelector('[data-compare-price]');
@@ -1192,7 +983,7 @@
               }
             }
           }
-          
+
           // Disable add to cart until flavor is selected
           if (addToCartButton) {
             const btnText = addToCartButton.querySelector('.btn-text');
@@ -1202,23 +993,23 @@
         } else if (packType === 'all-flavours') {
           // All Flavours - hide flavor selection
           flavorContainer.style.display = 'none';
-          
+
           // Find the All Flavours Set variant
           const allVariants = {{ product.variants | json }};
           const allFlavoursVariant = allVariants.find(v => {
             const title = v.title.toLowerCase();
             return title === 'all flavours set';
           });
-          
+
           if (allFlavoursVariant && variantInput) {
             variantInput.value = allFlavoursVariant.id;
-            
+
             // Update price display
             if (priceDisplay) {
               const price = parseFloat(allFlavoursVariant.price) / 100;
               priceDisplay.textContent = 'RM ' + price.toFixed(2);
             }
-            
+
             // Update compare at price if it exists
             const comparePrice = allFlavoursVariant.compare_at_price;
             const comparePriceDisplay = document.querySelector('[data-compare-price]');
@@ -1231,14 +1022,14 @@
                 comparePriceDisplay.style.display = 'none';
               }
             }
-            
+
             // Update images - use the configured all_flavours_image_index
             const allFlavoursImageIndex = {{ section.settings.all_flavours_image_index | minus: 1 }};
             const productImages = {{ product.images | json }};
-            
+
             if (productImages[allFlavoursImageIndex]) {
               const selectedImage = productImages[allFlavoursImageIndex];
-              
+
               // Update desktop main image
               const mainImage = document.querySelector('[data-main-image]');
               if (mainImage) {
@@ -1261,7 +1052,7 @@
                     left: stride * allFlavoursImageIndex,
                     behavior: 'smooth'
                   });
-                  
+
                   const dots = document.querySelectorAll('[data-dot-index]');
                   dots.forEach((dot, i) => {
                     if (i === allFlavoursImageIndex) {
@@ -1272,7 +1063,7 @@
                   });
                 }
               }
-              
+
               // Update desktop thumbnails
               const thumbnails = document.querySelectorAll('[data-thumbnail]');
               if (thumbnails.length > 0 && thumbnails[allFlavoursImageIndex]) {
@@ -1280,7 +1071,7 @@
                 thumbnails[allFlavoursImageIndex].classList.add('active');
               }
             }
-            
+
             // Enable the button if available
             if (addToCartButton) {
               const btnText = addToCartButton.querySelector('.btn-text');
@@ -1301,20 +1092,20 @@
     flavorButtons.forEach((button) => {
       button.addEventListener('click', function () {
         if (this.dataset.variantAvailable === 'false') return;
-        
+
         // Update active state for flavors
         flavorButtons.forEach((btn) => {
           btn.classList.remove('active');
         });
         this.classList.add('active');
-        
+
         selectedFlavor = this.dataset.flavorName;
-        
+
         // Update flavor display
         if (flavorDisplay) {
           flavorDisplay.textContent = selectedFlavor;
         }
-        
+
         // Update variant
         updateVariant(this);
       });
@@ -1328,12 +1119,12 @@
       const isAvailable = button.dataset.variantAvailable === 'true';
 
       variantInput.value = variantId;
-      
+
       if (priceDisplay) {
         const price = parseFloat(variantPrice) / 100;
         priceDisplay.textContent = 'RM ' + price.toFixed(2);
       }
-      
+
       // Update compare at price if it exists
       const comparePrice = button.dataset.variantComparePrice;
       const comparePriceDisplay = document.querySelector('[data-compare-price]');
@@ -1373,16 +1164,16 @@
         if (scrollContainer) {
           const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
           let matchingIndex = 0;
-          
+
           galleryImages.forEach((img, index) => {
             const imgSrc = img.src.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
             const variantSrc = variantImage.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
-            
+
             if (imgSrc.includes(variantSrc.split('/').pop().split('_')[0])) {
               matchingIndex = index;
             }
           });
-          
+
           const firstItem = scrollContainer.querySelector('.gallery-image-item');
           if (firstItem) {
             const gap = 4;
@@ -1391,7 +1182,7 @@
               left: stride * matchingIndex,
               behavior: 'smooth'
             });
-            
+
             const dots = document.querySelectorAll('[data-dot-index]');
             dots.forEach((dot, i) => {
               if (i === matchingIndex) {
@@ -1402,7 +1193,7 @@
             });
           }
         }
-        
+
         // Update desktop thumbnails
         const thumbnails = document.querySelectorAll('[data-thumbnail]');
         if (thumbnails.length > 0) {
@@ -1410,7 +1201,7 @@
             const thumbImg = thumb.querySelector('img');
             const thumbSrc = thumbImg.src.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
             const variantSrc = variantImage.split('?')[0].replace(/(_\d+x\d*\.)/g, '.');
-            
+
             if (thumbSrc.includes(variantSrc.split('/').pop().split('_')[0])) {
               thumbnails.forEach(t => t.classList.remove('active'));
               thumb.classList.add('active');
@@ -1428,15 +1219,15 @@
     const urlParams = new URLSearchParams(window.location.search);
     const urlVariantId = urlParams.get('variant');
     let variantAutoSelected = false;
-    
+
     if (urlVariantId) {
       // Check if it's the All Flavours Set variant
       const allVariants = {{ product.variants | json }};
       const urlVariant = allVariants.find(v => v.id.toString() === urlVariantId);
-      
+
       if (urlVariant) {
         const variantTitleLower = urlVariant.title.toLowerCase();
-        
+
         if (variantTitleLower === 'all flavours set') {
           // Select All Flavours pack
           packCards.forEach((c) => c.classList.remove('active'));
@@ -1444,18 +1235,18 @@
           if (allFlavoursCard) {
             allFlavoursCard.classList.add('active');
           }
-          
+
           selectedPackType = 'all-flavours';
           flavorContainer.style.display = 'none';
-          
+
           // Set variant and update price
           variantInput.value = urlVariant.id;
-          
+
           if (priceDisplay) {
             const price = parseFloat(urlVariant.price) / 100;
             priceDisplay.textContent = 'RM ' + price.toFixed(2);
           }
-          
+
           const comparePrice = urlVariant.compare_at_price;
           const comparePriceDisplay = document.querySelector('[data-compare-price]');
           if (comparePriceDisplay) {
@@ -1467,7 +1258,7 @@
               comparePriceDisplay.style.display = 'none';
             }
           }
-          
+
           if (addToCartButton) {
             const btnText = addToCartButton.querySelector('.btn-text');
             if (urlVariant.available) {
@@ -1478,7 +1269,7 @@
               if (btnText) btnText.textContent = 'SOLD OUT';
             }
           }
-          
+
           variantAutoSelected = true;
         } else {
           // It's a single flavor variant
@@ -1491,22 +1282,22 @@
               if (singleCard) {
                 singleCard.classList.add('active');
               }
-              
+
               selectedPackType = 'single';
               flavorContainer.style.display = 'block';
-              
+
               // Select this flavor button
               flavorButtons.forEach((flavorBtn) => {
                 flavorBtn.classList.remove('active');
               });
               btn.classList.add('active');
-              
+
               selectedFlavor = btn.dataset.flavorName;
-              
+
               if (flavorDisplay) {
                 flavorDisplay.textContent = selectedFlavor;
               }
-              
+
               // Update variant
               updateVariant(btn);
               variantAutoSelected = true;
@@ -1515,19 +1306,19 @@
         }
       }
     }
-    
+
     // Initialize: Select single pack by default if no variant was auto-selected
     if (!variantAutoSelected) {
       const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
       if (singlePackCard) {
         singlePackCard.classList.add('active');
         selectedPackType = 'single';
-        
+
         // Show flavor container
         if (flavorContainer) {
           flavorContainer.style.display = 'block';
         }
-        
+
         // Disable add to cart until flavor is selected
         if (addToCartButton) {
           const btnText = addToCartButton.querySelector('.btn-text');
@@ -1603,53 +1394,6 @@
       }
     });
   });
-
-   // Cart Drawer Functions
-  function openCartDrawer() {
-    document.getElementById('cartDrawer').classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-  
-  function closeCartDrawer() {
-    document.getElementById('cartDrawer').classList.remove('active');
-    document.body.style.overflow = '';
-  }
-  
-  async function updateCartDrawer() {
-    try {
-      const response = await fetch('/cart.js');
-      const cart = await response.json();
-      
-      const itemsContainer = document.getElementById('cartDrawerItems');
-      const totalElement = document.getElementById('cartDrawerTotal');
-      
-      if (cart.items.length === 0) {
-        itemsContainer.innerHTML = '<div class="cart-drawer-empty">Your cart is empty</div>';
-      } else {
-        itemsContainer.innerHTML = cart.items.map(item => `
-          <div class="cart-drawer-item">
-            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
-            <div class="cart-item-details">
-              <div class="cart-item-title">${item.product_title}</div>
-              ${item.variant_title ? `<div class="cart-item-variant">${item.variant_title}</div>` : ''}
-              <div class="cart-item-quantity">Qty: ${item.quantity}</div>
-              <div class="cart-item-price">RM ${(item.final_line_price / 100).toFixed(2)}</div>
-            </div>
-          </div>
-        `).join('');
-      }
-      
-      totalElement.textContent = `RM ${(cart.total_price / 100).toFixed(2)}`;
-      
-      // Update header cart count
-      const cartCountElement = document.getElementById('cartCount');
-      if (cartCountElement) {
-        cartCountElement.textContent = cart.item_count;
-      }
-    } catch (error) {
-      console.error('Error updating cart drawer:', error);
-    }
-  }
 </script>
 
 {% schema %}

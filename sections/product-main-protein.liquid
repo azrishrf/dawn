@@ -148,7 +148,7 @@
                     <div class="pack-price">RM 197.00</div>
                   {% endif %}
                   <div class="pack-freebie">FREE SHAKER</div>
-                  <div class="pack-save">SAVE RM17</div>
+                  <div class="pack-save">SAVE RM2</div>
                 </div>
               </div>
 
@@ -263,6 +263,336 @@
 
           <!-- Hidden variant input -->
           <input type="hidden" name="id" data-variant-id-input value="{{ current_variant.id }}">
+
+          <!-- Order Bumps (Block-based) -->
+          {% if section.blocks.size > 0 %}
+            <div class="order-bumps-wrapper" data-bump-container style="display: none;">
+              <div class="bump-section-header">
+                <p class="bump-section-title">FREQUENTLY BOUGHT TOGETHER</p>
+                <p class="bump-section-subtitle">
+                  {% comment %}
+                    <svg
+                      class="bump-tag-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 200 200"
+                    >
+                      <path fill="#f7931e" d="M40 100c0-33.137 26.863-60 60-60h60c16.569 0 30 13.431 30 30v60c0 16.569-13.431 30-30 30h-60c-33.137 0-60-26.863-60-60zm60-20c11.046 0 20-8.954 20-20s-8.954-20-20-20-20 8.954-20 20 8.954 20 20 20z"/>
+                    </svg>
+                  {% endcomment %}
+                  Buy this bundle &amp; get a special add-on price!
+                </p>
+              </div>
+
+              {% for block in section.blocks %}
+                {% if block.type == 'order_bump' and block.settings.bump_product != blank %}
+                  {% assign bump_prod = block.settings.bump_product %}
+                  <label
+                    class="order-bump-label"
+                    for="order-bump-{{ forloop.index }}"
+                    data-bump-pack="{{ block.settings.bump_show_on }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="order-bump-{{ forloop.index }}"
+                      data-bump-variant="{{ bump_prod.selected_or_first_available_variant.id }}"
+                      class="bump-checkbox"
+                    >
+
+                    {% if bump_prod.featured_image %}
+                      <img
+                        src="{{ bump_prod.featured_image | img_url: '160x' }}"
+                        alt="{{ bump_prod.title }}"
+                        class="bump-image"
+                        data-bump-image
+                        width="64"
+                        height="64"
+                      >
+                    {% endif %}
+                    <div class="bump-info">
+                      <div class="bump-text">
+                        <span class="bump-title">
+                          {%- if block.settings.bump_title != blank -%}
+                            {{ block.settings.bump_title }}
+                          {%- else -%}
+                            {{ bump_prod.title }}
+                          {%- endif -%}
+                        </span>
+                      </div>
+                      {% if block.settings.show_variant_selector and bump_prod.variants.size > 1 %}
+                        {% assign first_available = bump_prod.selected_or_first_available_variant %}
+                        {% assign bump_discount_cents = block.settings.bump_discount_rm | times: 100 %}
+                        <div
+                          class="bump-variant-dropdown"
+                          data-bump-variants
+                          data-bump-discount-cents="{{ bump_discount_cents }}"
+                        >
+                          <button type="button" class="bump-variant-trigger" data-bump-variant-trigger>
+                            <span class="bump-variant-selected" data-bump-variant-label>
+                              {{- first_available.title -}}
+                            </span>
+                            <svg
+                              width="10"
+                              height="6"
+                              viewBox="0 0 10 6"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                          <ul class="bump-variant-list" data-bump-variant-list>
+                            {% for variant in bump_prod.variants %}
+                              <li
+                                class="bump-variant-option {% if variant.id == first_available.id %}active{% endif %} {% unless variant.available %}sold-out{% endunless %}"
+                                data-bump-variant-id="{{ variant.id }}"
+                                data-bump-variant-title="{{ variant.title }}"
+                                data-variant-price="{{ variant.price }}"
+                                data-variant-compare-price="{{ variant.compare_at_price }}"
+                                {% if variant.featured_image %}
+                                  data-variant-image="{{ variant.featured_image | img_url: '160x' }}"
+                                {% endif %}
+                              >
+                                {{ variant.title }}
+                                {%- unless variant.available %}
+                                  <span class="bump-variant-soldout-tag">Sold out</span>
+                                {%- endunless %}
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      {% endif %}
+                      <div class="bump-pricing" data-bump-pricing>
+                        {% assign bump_variant = bump_prod.selected_or_first_available_variant %}
+                        {% assign bump_discount_cents = block.settings.bump_discount_rm | times: 100 %}
+                        {% if bump_discount_cents > 0 %}
+                          {% assign bump_discounted_price = bump_variant.price | minus: bump_discount_cents %}
+                          <span class="bump-price-original">RM {{ bump_variant.price | money_without_currency }}</span>
+                          <span class="bump-price-final">RM {{ bump_discounted_price | money_without_currency }}</span>
+                        {% elsif bump_variant.compare_at_price > bump_variant.price %}
+                          <span class="bump-price-original"
+                            >RM {{ bump_variant.compare_at_price | money_without_currency -}}
+                          </span>
+                          <span class="bump-price-final">RM {{ bump_variant.price | money_without_currency }}</span>
+                        {% else %}
+                          <span class="bump-price-final">RM {{ bump_variant.price | money_without_currency }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </label>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <style>
+              .order-bumps-wrapper {
+                margin-bottom: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                {% comment %} overflow: hidden; {% endcomment %}
+                background: #fff;
+                padding-bottom: 10px;
+              }
+              {% comment %} .bump-section-header {
+                {% comment %} padding: 14px 16px 12px; {% endcomment %}
+                 margin-bottom: 12px;
+                {% comment %} border-bottom: 1px solid #e5e7eb; {% endcomment %}
+              } {% endcomment %}
+              .bump-section-title {
+                font-size: 14px;
+                font-weight: bold;
+                {% comment %} letter-spacing: 0.1em; {% endcomment %}
+                margin: 0;
+              }
+              .bump-section-subtitle {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: #374151;
+                font-weight: 500;
+                margin: 0;
+              }
+              .bump-tag-icon {
+                flex-shrink: 0;
+                vertical-align: middle;
+                width: 18px;
+                height: 18px;
+                min-width: 18px;
+              }
+              .order-bump-label {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 12px;
+                cursor: pointer;
+                border-bottom: 1px solid #f3f4f6;
+                background-color: #fff;
+                transition: background-color 0.2s ease;
+                margin: 0;
+                {% comment %} border-radius: 8px; {% endcomment %}
+                {% comment %} border: 1px solid #e5e7eb; {% endcomment %}
+                margin-top: 10px;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+              }
+
+              .order-bump-label:hover {
+                background-color: #F8F8F8;
+                border-color: #D8D8D8;
+              }
+              .order-bump-label:has(input:checked):hover {
+                background-color: #F8F8F8;
+                border-color: #D8D8D8;
+              }
+              .order-bump-label:has(input:checked) {
+                background-color: #F8F8F8;
+                border-color: #D8D8D8;
+              }
+              .order-bump-label:has(input:checked) .bump-price-original {
+                color: #9ca3af;
+              }
+              .bump-checkbox {
+                width: 16px;
+                height: 16px;
+                min-width: 16px;
+                cursor: pointer;
+                accent-color: #333;
+                border-radius: 4px;
+                flex-shrink: 0;
+              }
+              .bump-image {
+                width: 64px;
+                height: 70px;
+                min-width: 64px;
+                object-fit: cover;
+                {% comment %} border-radius: 6px; {% endcomment %}
+                {% comment %} border: 1px solid #e5e7eb; {% endcomment %}
+                background: #f9fafb;
+                border-radius: 8px;
+              }
+              .bump-info {
+                flex: 1;
+                min-width: 0;
+                max-height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: 10px;
+              }
+              .bump-text {
+                display: flex;
+                flex-direction: column;
+              }
+              .bump-title {
+                font-size: 13px;
+                font-weight: 600;
+                color: #111;
+                line-height: 1.4;
+              }
+              .bump-pricing {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                align-self: flex-end;
+                gap: 1px;
+              }
+              .bump-variant-dropdown {
+                position: relative;
+                width: 100%;
+              }
+              .bump-variant-trigger {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 6px;
+                padding: 5px 8px;
+                font-size: 11px;
+                font-weight: 500;
+                color: #374151;
+                background: #fff;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: border-color 0.15s ease;
+                text-align: left;
+              }
+              .bump-variant-trigger:hover {
+                border-color: #333;
+              }
+              .bump-variant-selected {
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+              .bump-variant-list {
+                display: none;
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                right: 0;
+                background: #fff;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                z-index: 50;
+                list-style: none;
+                margin: 0;
+                padding: 4px 0;
+                max-height: 160px;
+                overflow-y: auto;
+              }
+              .bump-variant-list.open {
+                display: block;
+              }
+              .bump-variant-option {
+                padding: 7px 10px;
+                font-size: 11px;
+                color: #374151;
+                cursor: pointer;
+                transition: background 0.1s ease;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              }
+              .bump-variant-option:hover:not(.sold-out) {
+                background: #f3f4f6;
+              }
+              .bump-variant-option.active {
+                font-weight: 600;
+                color: #111;
+                background: #f0f0f0;
+              }
+              .bump-variant-option.sold-out {
+                opacity: 0.4;
+                cursor: not-allowed;
+              }
+              .bump-variant-soldout-tag {
+                font-size: 9px;
+                background: #f3f4f6;
+                border-radius: 4px;
+                padding: 1px 4px;
+                color: #9ca3af;
+              }
+              .bump-price-original {
+                font-size: 11px;
+                color: #9ca3af;
+                text-decoration: line-through;
+                line-height: 11px;
+              }
+              .bump-price-final {
+                font-size: 14px;
+                font-weight: 700;
+                color: #111;
+                line-height: 14px;
+              }
+            </style>
+          {% endif %}
 
           <!-- Quantity & Add to Cart -->
           <div class="cart-controls">
@@ -650,7 +980,7 @@
 
   /* Pack Selection Styles */
   .pack-selection-container {
-    margin-bottom: 26px;
+    margin-bottom: 24px;
   }
 
   .pack-options-grid {
@@ -888,45 +1218,6 @@
     cursor: not-allowed;
   }
 
-  /* Spinner Styles */
-  .loading-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-  }
-
-  .spinner {
-    animation: rotator 1.4s linear infinite;
-  }
-
-  @keyframes rotator {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(270deg); }
-  }
-
-  .path {
-    stroke-dasharray: 280;
-    stroke-dashoffset: 0;
-    transform-origin: center;
-    stroke: #ffffff;
-    animation: dash 1.4s ease-in-out infinite;
-  }
-
-  @keyframes dash {
-    0% { stroke-dashoffset: 280; }
-    50% {
-      stroke-dashoffset: 75;
-      transform: rotate(135deg);
-    }
-    100% {
-      stroke-dashoffset: 280;
-      transform: rotate(450deg);
-    }
-  }
-
   .product-description {
     margin-bottom: 32px;
     color: #4b5563;
@@ -1002,6 +1293,45 @@
     color: #4b5563;
     line-height: 1.6;
     margin-bottom: 16px;
+  }
+
+  /* Spinner Styles */
+  .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+  }
+
+  .spinner {
+    animation: rotator 1.4s linear infinite;
+  }
+
+  @keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+  }
+
+  .path {
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    stroke: #ffffff;
+    animation: dash 1.4s ease-in-out infinite;
+  }
+
+  @keyframes dash {
+    0% { stroke-dashoffset: 280; }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 280;
+      transform: rotate(450deg);
+    }
   }
 </style>
 
@@ -1113,6 +1443,29 @@
         selectedPackType = packType;
         selectedFlavor = null; // Reset flavor selection
         
+        // Show/hide bumps based on pack type (per-bump targeting)
+        const bumpContainer = document.querySelector('[data-bump-container]');
+        if (bumpContainer) {
+          const allBumpLabels = bumpContainer.querySelectorAll('.order-bump-label');
+          let visibleBumpCount = 0;
+
+          allBumpLabels.forEach(label => {
+            const bumpPack = label.dataset.bumpPack || 'single';
+            const shouldShow = bumpPack === 'all' || bumpPack === packType;
+            label.style.display = shouldShow ? 'flex' : 'none';
+            if (!shouldShow) {
+              // Uncheck hidden bumps
+              const cb = label.querySelector('.bump-checkbox');
+              if (cb) cb.checked = false;
+            } else {
+              visibleBumpCount++;
+            }
+          });
+
+          // Show the container only if at least one bump is visible
+          bumpContainer.style.display = visibleBumpCount > 0 ? 'flex' : 'none';
+        }
+
         // Show/hide flavor selection based on pack type
         if (packType === 'single' || packType === 'combo2' || packType === 'combo3') {
           flavorContainer.style.display = 'block';
@@ -1172,6 +1525,81 @@
           }
         }
       });
+    });
+
+    // Bump variant dropdown handling
+    document.querySelectorAll('[data-bump-variants]').forEach(dropdown => {
+      const trigger = dropdown.querySelector('[data-bump-variant-trigger]');
+      const list = dropdown.querySelector('[data-bump-variant-list]');
+      const label = dropdown.querySelector('[data-bump-variant-label]');
+      const parentLabel = dropdown.closest('.order-bump-label');
+      const bumpCheckbox = parentLabel ? parentLabel.querySelector('.bump-checkbox') : null;
+      const options = list ? list.querySelectorAll('.bump-variant-option') : [];
+
+      if (!trigger || !list) return;
+
+      // Toggle dropdown
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const isOpen = list.classList.contains('open');
+        // Close all other open dropdowns
+        document.querySelectorAll('.bump-variant-list.open').forEach(l => l.classList.remove('open'));
+        if (!isOpen) list.classList.add('open');
+      });
+
+      // Select option
+      options.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (this.classList.contains('sold-out')) return;
+
+          // Update active
+          options.forEach(o => o.classList.remove('active'));
+          this.classList.add('active');
+
+          // Update trigger label
+          if (label) label.textContent = this.dataset.bumpVariantTitle;
+
+          // Update bump checkbox variant
+          if (bumpCheckbox) bumpCheckbox.dataset.bumpVariant = this.dataset.bumpVariantId;
+
+          // Update bump image if variant has its own image
+          const variantImage = this.dataset.variantImage;
+          const bumpImg = parentLabel ? parentLabel.querySelector('[data-bump-image]') : null;
+          if (bumpImg && variantImage) {
+            bumpImg.src = variantImage;
+          }
+
+          // Update pricing
+          const pricingEl = parentLabel ? parentLabel.querySelector('[data-bump-pricing]') : null;
+          if (pricingEl) {
+            const price = parseInt(this.dataset.variantPrice || '0');
+            const comparePrice = parseInt(this.dataset.variantComparePrice || '0');
+            const discountCents = parseInt(dropdown.dataset.bumpDiscountCents || '0');
+
+            const fmt = (cents) => 'RM ' + (cents / 100).toFixed(2);
+
+            if (discountCents > 0) {
+              const discounted = price - discountCents;
+              pricingEl.innerHTML = `<span class="bump-price-original">${fmt(price)}</span><span class="bump-price-final">${fmt(discounted)}</span>`;
+            } else if (comparePrice > price) {
+              pricingEl.innerHTML = `<span class="bump-price-original">${fmt(comparePrice)}</span><span class="bump-price-final">${fmt(price)}</span>`;
+            } else {
+              pricingEl.innerHTML = `<span class="bump-price-final">${fmt(price)}</span>`;
+            }
+          }
+
+          // Close dropdown
+          list.classList.remove('open');
+        });
+      });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.bump-variant-list.open').forEach(l => l.classList.remove('open'));
     });
 
     // Flavor button click handling
@@ -1325,6 +1753,11 @@
           
           selectedPackType = packType;
           
+          const bumpContainer = document.querySelector('[data-bump-container]');
+          if (bumpContainer && packType !== 'single') {
+            bumpContainer.style.display = 'none';
+          }
+          
           // Show/hide flavor selection based on pack type
           if (packType === 'single' || packType === 'combo2' || packType === 'combo3') {
             flavorContainer.style.display = 'block';
@@ -1355,18 +1788,19 @@
       });
     }
     
-    // Initialize: Select 'combo2' (Most Popular) pack by default and 'Chocolate Indulgence' flavor if no variant was auto-selected
+    // Initialize: Select single pack by default if no variant was auto-selected
     if (!variantAutoSelected) {
+      const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
       const combo2PackCard = document.querySelector('[data-pack-card][data-pack-type="combo2"]');
       if (combo2PackCard) {
         combo2PackCard.classList.add('active');
         selectedPackType = 'combo2';
-        
+
         // Show flavor container
         if (flavorContainer) {
           flavorContainer.style.display = 'block';
         }
-        
+
         // Show only combo2 pack flavors
         flavorButtons.forEach((btn) => {
           if (btn.dataset.packType === 'combo2') {
@@ -1377,7 +1811,7 @@
         });
 
         // Try to auto-select "Chocolate Indulgence"
-        const chocIndulgenceBtn = Array.from(flavorButtons).find(btn => 
+        const chocIndulgenceBtn = Array.from(flavorButtons).find(btn =>
           btn.dataset.packType === 'combo2' && btn.dataset.flavorName.toLowerCase() === 'chocolate indulgence'
         );
 
@@ -1397,6 +1831,20 @@
           }
         }
       }
+    }
+
+    // Run bump filter on init for the default selected pack
+    const bumpContainer = document.querySelector('[data-bump-container]');
+    if (bumpContainer) {
+      const allBumpLabels = bumpContainer.querySelectorAll('.order-bump-label');
+      let visibleBumpCount = 0;
+      allBumpLabels.forEach(label => {
+        const bumpPack = label.dataset.bumpPack || 'single';
+        const shouldShow = bumpPack === 'all' || bumpPack === selectedPackType;
+        label.style.display = shouldShow ? 'flex' : 'none';
+        if (shouldShow) visibleBumpCount++;
+      });
+      bumpContainer.style.display = visibleBumpCount > 0 ? 'flex' : 'none';
     }
 
     // Quantity Controls
@@ -1453,12 +1901,36 @@
         if (spinner) spinner.style.display = 'block';
       }
 
-      const formData = new FormData(form);
+      const variantInput = form.querySelector('[name="id"]');
+      const quantityInput = form.querySelector('[name="quantity"]');
+      const bumpCheckboxes = document.querySelectorAll('.bump-checkbox');
+      
+      let itemsToAdd = [
+        {
+          id: variantInput.value,
+          quantity: parseInt(quantityInput.value) || 1
+        }
+      ];
+
+      // If they selected the order bump, push it into the array!
+      if (bumpCheckboxes) {
+        bumpCheckboxes.forEach(cb => {
+          if (cb.checked) {
+            itemsToAdd.push({
+              id: cb.dataset.bumpVariant,
+              quantity: 1
+            });
+          }
+        });
+      }
 
       try {
         const response = await fetch('/cart/add.js', {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ items: itemsToAdd }),
         });
 
         if (response.ok) {
@@ -1553,9 +2025,54 @@
       "label": "Accordion 2 Content"
     }
   ],
+  "blocks": [
+    {
+      "type": "order_bump",
+      "name": "Order Bump",
+      "settings": [
+        {
+          "type": "product",
+          "id": "bump_product",
+          "label": "Bump Product"
+        },
+        {
+          "type": "text",
+          "id": "bump_title",
+          "label": "Custom Title (optional — uses product name if blank)"
+        },
+        {
+          "type": "select",
+          "id": "bump_show_on",
+          "label": "Show on Pack",
+          "info": "Choose which pack selection triggers this bump to appear.",
+          "default": "single",
+          "options": [
+            { "value": "single", "label": "Single 1kg only" },
+            { "value": "combo2", "label": "Combo Set 2kg only" },
+            { "value": "combo3", "label": "Combo Set 3kg only" },
+            { "value": "all", "label": "All packs" }
+          ]
+        },
+        {
+          "type": "number",
+          "id": "bump_discount_rm",
+          "label": "Discount Amount (RM)",
+          "info": "Enter the RM discount from your automatic discount. E.g. enter 10 for RM10 off. Leave 0 if no discount.",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "show_variant_selector",
+          "label": "Show variant selector",
+          "info": "Enable to let customers choose a specific variant (e.g. color/size) of the bump product.",
+          "default": false
+        }
+      ]
+    }
+  ],
   "presets": [
     {
-      "name": "Product Main"
+      "name": "Product Main Protein"
     }
   ]
 }
