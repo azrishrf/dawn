@@ -1,3 +1,11 @@
+<style>
+  .cart-drawer-overlay,
+  .variant-drawer-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+</style>
 <div class="cart-drawer-overlay" id="cartDrawer">
   <div class="cart-drawer-backdrop" onclick="closeCartDrawer()"></div>
   <div class="cart-drawer">
@@ -17,7 +25,10 @@
           <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
           <line x1="7" y1="7" x2="7.01" y2="7"></line>
         </svg>
-        <p><strong>Buy 1 Protein, unlock a discount</strong> get select items at a special add-on price.</p>
+        <p>
+          <strong>Unlock exclusive add-on discounts</strong> <br>
+          Available with any Protein Set purchase.
+        </p>
       </div>
 
       <div class="cart-drawer-items-container">
@@ -221,7 +232,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      width: 400px;
+      width: 600px;
       max-width: 90vw;
       max-height: none;
       transform: translateX(100%);
@@ -526,13 +537,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   /* Show dashed separator only when discount rows are above the total */
   .cart-drawer-footer-row ~ .cart-drawer-total {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px dashed #e5e7eb;
   }
 
@@ -724,7 +735,7 @@
   }
 
   .cart-drawer-footer {
-    padding: 20px;
+    padding: 16px 20px;
     border-top: 1px solid #e5e7eb;
     background-color: #fff;
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
@@ -815,7 +826,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      width: 400px;
+      width: 500px;
       max-width: 90vw;
       max-height: none;
       transform: translateX(100%);
@@ -1063,7 +1074,7 @@
 
       const isS = h.includes('seasoning');
       const isSh = h.includes('shaker') && h.includes('600ml');
-      const isC = h.includes('creatine') && (t.includes('100g') || t.includes('500g'));
+      const isC = h.includes('creatine') && t.includes('500g');
       const isA = h.includes('apparel');
 
       if (isS || isSh || isC || isA) return total + item.quantity;
@@ -1077,8 +1088,7 @@
 
     if (proteinCount > totalConsumed) {
       // Check Rule 3 (Best Discount: RM 10.00)
-      const isCreatineTarget =
-        lowerHandle.includes('creatine') && (lowerVariantTitle.includes('100g') || lowerVariantTitle.includes('500g'));
+      const isCreatineTarget = lowerHandle.includes('creatine') && lowerVariantTitle.includes('500g');
       const isApparelTarget = lowerHandle.includes('apparel');
       if (isCreatineTarget || isApparelTarget) {
         const newPrice = Math.max(0, basePrice - 1000);

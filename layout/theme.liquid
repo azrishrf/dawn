@@ -1,6 +1,7 @@
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
   <head>
+    <meta name="google-site-verification" content="E1yOrYxiN27pxHrWqnSqT1SESkBHnYyoZnHdknVGYXQ">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -310,7 +311,9 @@
       {{ 'accessibility.skip_to_text' | t }}
     </a>
 
-    {%- render 'custom-cart-drawer' -%}
+    {%- if settings.cart_type == 'drawer' -%}
+      {%- render 'custom-cart-drawer' -%}
+    {%- endif -%}
 
     {% sections 'header-group' %}
 
@@ -374,5 +377,8 @@
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
+    {%- if settings.cart_type == 'drawer' -%}
+      <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
   </body>
 </html>

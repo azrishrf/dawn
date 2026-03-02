@@ -78,11 +78,14 @@
         <!-- Price -->
         <div class="product-price">
           <span data-product-price>RM {{ current_variant.price | money_without_currency }}</span>
-          {% if current_variant.compare_at_price > current_variant.price %}
-            <span class="price-compare" data-compare-price
-              >RM {{ current_variant.compare_at_price | money_without_currency -}}
-            </span>
-          {% endif %}
+          <span
+            class="price-compare"
+            data-compare-price
+            {% unless current_variant.compare_at_price > current_variant.price %}
+              style="display: none;"
+            {% endunless %}
+            >RM {{ current_variant.compare_at_price | money_without_currency -}}
+          </span>
         </div>
 
         <!-- Product Form -->
@@ -182,7 +185,19 @@
               data-add-to-cart
               disabled
             >
-              SELECT SIZE
+              <span class="btn-text">SELECT SIZE</span>
+              <span class="loading-spinner" style="display: none;">
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  role="presentation"
+                  class="spinner"
+                  viewBox="0 0 66 66"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                </svg>
+              </span>
             </button>
           </div>
         {% endform %}
@@ -195,6 +210,8 @@
     </div>
   </div>
 </div>
+
+{% render 'custom-cart-drawer' %}
 
 <style>
   .product-main-section {
@@ -636,6 +653,10 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: 'Funnel Display', sans-serif;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .add-to-cart-button:hover {
@@ -645,6 +666,45 @@
   .add-to-cart-button:disabled {
     background-color: #6b7280;
     cursor: not-allowed;
+  }
+
+  /* Spinner Styles */
+  .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+  }
+
+  .spinner {
+    animation: rotator 1.4s linear infinite;
+  }
+
+  @keyframes rotator {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+  }
+
+  .path {
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    stroke: #ffffff;
+    animation: dash 1.4s ease-in-out infinite;
+  }
+
+  @keyframes dash {
+    0% { stroke-dashoffset: 280; }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 280;
+      transform: rotate(450deg);
+    }
   }
 
   .product-description {
@@ -702,6 +762,29 @@
             scrollContainer.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             currentIndex = index;
             updateDots(index);
+
+            // Sync with variant and auto-click available variant (Mobile)
+            const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
+            if (galleryImages[index] && sizeButtons.length > 0) {
+              const imgSrc = galleryImages[index].src.replace(/_(200x|400x|800x|1200x)/, '');
+              const matchingSizeButton = Array.from(sizeButtons).find((btn) => {
+                if (btn.dataset.variantImage && btn.dataset.variantAvailable === 'true') {
+                  const btnImgSrc = btn.dataset.variantImage.replace(/_(200x|400x|800x|1200x)/, '');
+                  return btnImgSrc === imgSrc;
+                }
+                return false;
+              });
+
+              if (matchingSizeButton) {
+                // Ensure apparel card is selected before we click the size
+                const apparelType = matchingSizeButton.dataset.apparelType;
+                const matchingApparelCard = Array.from(apparelCards).find((c) => c.dataset.apparelType === apparelType);
+                if (matchingApparelCard && !matchingApparelCard.classList.contains('active')) {
+                  matchingApparelCard.click();
+                }
+                setTimeout(() => matchingSizeButton.click(), 10);
+              }
+            }
           }
         });
       });
@@ -728,11 +811,33 @@
       thumbnails.forEach((thumbnail, index) => {
         thumbnail.addEventListener('click', function () {
           const imageUrl = this.querySelector('img').src.replace('200x', '1200x');
+          const cleanImageUrl = imageUrl.replace(/_(200x|400x|800x|1200x)/, '');
           mainImage.src = imageUrl;
 
           // Update active thumbnail
           thumbnails.forEach((t) => t.classList.remove('active'));
           this.classList.add('active');
+
+          // Sync with variant and auto-click if available
+          if (sizeButtons.length > 0) {
+            const matchingSizeButton = Array.from(sizeButtons).find((btn) => {
+              if (btn.dataset.variantImage && btn.dataset.variantAvailable === 'true') {
+                const btnImgSrc = btn.dataset.variantImage.replace(/_(200x|400x|800x|1200x)/, '');
+                return btnImgSrc === cleanImageUrl;
+              }
+              return false;
+            });
+
+            if (matchingSizeButton) {
+              // Ensure apparel card is selected before we click the size
+              const apparelType = matchingSizeButton.dataset.apparelType;
+              const matchingApparelCard = Array.from(apparelCards).find((c) => c.dataset.apparelType === apparelType);
+              if (matchingApparelCard && !matchingApparelCard.classList.contains('active')) {
+                matchingApparelCard.click();
+              }
+              setTimeout(() => matchingSizeButton.click(), 10);
+            }
+          }
         });
       });
 
@@ -746,14 +851,16 @@
     const form = document.querySelector('[data-product-form]');
     if (!form) return;
 
+    const section = form.closest('.product-main-section') || document;
+
     // Apparel and Size Selection
-    const apparelCards = document.querySelectorAll('[data-apparel-card]');
-    const sizeContainer = document.querySelector('[data-size-container]');
-    const sizeButtons = document.querySelectorAll('[data-size-button]');
-    const sizeDisplay = document.querySelector('[data-size-display]');
-    const variantInput = document.querySelector('[data-variant-id-input]');
-    const priceDisplay = document.querySelector('[data-product-price]');
-    const addToCartButton = document.querySelector('[data-add-to-cart]');
+    const apparelCards = section.querySelectorAll('[data-apparel-card]');
+    const sizeContainer = section.querySelector('[data-size-container]');
+    const sizeButtons = section.querySelectorAll('[data-size-button]');
+    const sizeDisplay = section.querySelector('[data-size-display]');
+    const variantInput = section.querySelector('[data-variant-id-input]');
+    const priceDisplay = section.querySelector('[data-product-price]');
+    const addToCartButton = section.querySelector('[data-add-to-cart]');
 
     let selectedApparelType = null;
     let selectedSize = null;
@@ -790,8 +897,17 @@
 
         // Update button state
         if (addToCartButton) {
+          const btnText = addToCartButton.querySelector('.btn-text');
           addToCartButton.disabled = true;
-          addToCartButton.textContent = 'SELECT SIZE';
+          if (btnText) btnText.textContent = 'SELECT SIZE';
+        }
+
+        // Auto-select first available size to trigger price update
+        const firstAvailableSize = Array.from(sizeButtons).find(
+          (btn) => btn.dataset.apparelType === apparelType && btn.dataset.variantAvailable === 'true'
+        );
+        if (firstAvailableSize) {
+          firstAvailableSize.click();
         }
       });
     });
@@ -838,7 +954,7 @@
 
       // Update compare at price if it exists
       const comparePrice = button.dataset.variantComparePrice;
-      const comparePriceDisplay = document.querySelector('[data-compare-price]');
+      const comparePriceDisplay = section.querySelector('[data-compare-price]');
       if (comparePriceDisplay) {
         if (comparePrice && parseFloat(comparePrice) > parseFloat(variantPrice)) {
           const comparePriceValue = parseFloat(comparePrice) / 100;
@@ -851,12 +967,13 @@
 
       // Update button state
       if (addToCartButton) {
+        const btnText = addToCartButton.querySelector('.btn-text');
         if (isAvailable) {
           addToCartButton.disabled = false;
-          addToCartButton.textContent = 'ADD TO CART';
+          if (btnText) btnText.textContent = 'ADD TO CART';
         } else {
           addToCartButton.disabled = true;
-          addToCartButton.textContent = 'OUT OF STOCK';
+          if (btnText) btnText.textContent = 'OUT OF STOCK';
         }
       }
 
@@ -864,13 +981,13 @@
       const variantImage = button.dataset.variantImage;
       if (variantImage) {
         // Update desktop main image
-        const mainImage = document.querySelector('[data-main-image]');
+        const mainImage = section.querySelector('[data-main-image]');
         if (mainImage) {
           mainImage.src = variantImage;
         }
 
         // Update mobile gallery - find and scroll to matching image
-        const scrollContainer = document.querySelector('[data-gallery-scroll]');
+        const scrollContainer = section.querySelector('[data-gallery-scroll]');
         if (scrollContainer) {
           const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
           let matchIndex = -1;
@@ -894,7 +1011,7 @@
               scrollContainer.scrollTo({ left: scrollLeft, behavior: 'smooth' });
 
               // Update dots
-              const dots = document.querySelectorAll('[data-dot-index]');
+              const dots = section.querySelectorAll('[data-dot-index]');
               dots.forEach((dot, i) => {
                 if (i === matchIndex) {
                   dot.classList.add('active');
@@ -907,7 +1024,7 @@
         }
 
         // Update desktop thumbnails
-        const thumbnails = document.querySelectorAll('[data-thumbnail]');
+        const thumbnails = section.querySelectorAll('[data-thumbnail]');
         if (thumbnails.length > 0) {
           thumbnails.forEach((thumb, index) => {
             const thumbImg = thumb.querySelector('img');
@@ -958,9 +1075,9 @@
     }
 
     // Quantity Controls
-    const quantityInput = document.querySelector('[data-quantity-input]');
-    const minusButton = document.querySelector('[data-quantity-minus]');
-    const plusButton = document.querySelector('[data-quantity-plus]');
+    const quantityInput = section.querySelector('[data-quantity-input]');
+    const minusButton = section.querySelector('[data-quantity-minus]');
+    const plusButton = section.querySelector('[data-quantity-plus]');
 
     if (minusButton && quantityInput) {
       minusButton.addEventListener('click', function () {
@@ -982,6 +1099,17 @@
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
+      const submitButton = form.querySelector('[data-add-to-cart]');
+      const btnText = submitButton ? submitButton.querySelector('.btn-text') : null;
+      const spinner = submitButton ? submitButton.querySelector('.loading-spinner') : null;
+
+      // Show loading state
+      if (submitButton) {
+        submitButton.disabled = true;
+        if (btnText) btnText.style.opacity = '0';
+        if (spinner) spinner.style.display = 'block';
+      }
+
       const formData = new FormData(form);
 
       try {
@@ -991,14 +1119,26 @@
         });
 
         if (response.ok) {
-          await updateCartDrawer();
-          openCartDrawer();
+          const data = await response.json();
+          // Trigger cart update event
+          const event = new CustomEvent('cart:updated', { detail: data });
+          document.dispatchEvent(event);
+
+          if (typeof openCartDrawer !== 'undefined') openCartDrawer();
+          if (typeof updateCartDrawer !== 'undefined') updateCartDrawer();
         } else {
           const errorData = await response.json();
           console.error('Error adding to cart:', errorData);
         }
       } catch (error) {
         console.error('Error adding to cart:', error);
+      } finally {
+        // Reset loading state
+        if (submitButton) {
+          submitButton.disabled = false;
+          if (btnText) btnText.style.opacity = '1';
+          if (spinner) spinner.style.display = 'none';
+        }
       }
     });
   });

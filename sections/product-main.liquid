@@ -87,11 +87,14 @@
         <!-- Price -->
         <div class="product-price">
           <span data-product-price>RM {{ current_variant.price | money_without_currency }}</span>
-          {% if current_variant.compare_at_price > current_variant.price %}
-            <span class="price-compare" data-compare-price
-              >RM {{ current_variant.compare_at_price | money_without_currency -}}
-            </span>
-          {% endif %}
+          <span
+            class="price-compare"
+            data-compare-price
+            {% unless current_variant.compare_at_price > current_variant.price %}
+              style="display: none;"
+            {% endunless %}
+            >RM {{ current_variant.compare_at_price | money_without_currency -}}
+          </span>
         </div>
 
         {% comment %} <hr class="product-divider"> {% endcomment %}
@@ -395,7 +398,6 @@
     </div>
   </div>
 </div>
-
 <style>
   .product-main-section {
     background-color: #fff;
@@ -1089,14 +1091,16 @@
     const form = document.querySelector('[data-product-form]');
     if (!form) return;
 
+    const section = form.closest('.product-main-section') || document;
+
     // Pack and Flavor Selection
-    const packCards = document.querySelectorAll('[data-pack-card]');
-    const flavorContainer = document.querySelector('[data-flavor-container]');
-    const flavorButtons = document.querySelectorAll('[data-flavor-button]');
-    const flavorDisplay = document.querySelector('[data-flavor-display]');
-    const variantInput = document.querySelector('[data-variant-id-input]');
-    const priceDisplay = document.querySelector('[data-product-price]');
-    const addToCartButton = document.querySelector('[data-add-to-cart]');
+    const packCards = section.querySelectorAll('[data-pack-card]');
+    const flavorContainer = section.querySelector('[data-flavor-container]');
+    const flavorButtons = section.querySelectorAll('[data-flavor-button]');
+    const flavorDisplay = section.querySelector('[data-flavor-display]');
+    const variantInput = section.querySelector('[data-variant-id-input]');
+    const priceDisplay = section.querySelector('[data-product-price]');
+    const addToCartButton = section.querySelector('[data-add-to-cart]');
 
     let selectedPackType = 'single'; // Default to single pack
     let selectedFlavor = null;
@@ -1152,7 +1156,7 @@
             
             // Update compare at price if it exists
             const comparePrice = firstPackVariant.compare_at_price;
-            const comparePriceDisplay = document.querySelector('[data-compare-price]');
+            const comparePriceDisplay = section.querySelector('[data-compare-price]');
             if (comparePriceDisplay) {
               if (comparePrice && parseFloat(comparePrice) > parseFloat(firstPackVariant.price)) {
                 const compareAmount = parseFloat(comparePrice) / 100;
@@ -1216,7 +1220,7 @@
       
       // Update compare at price if it exists
       const comparePrice = button.dataset.variantComparePrice;
-      const comparePriceDisplay = document.querySelector('[data-compare-price]');
+      const comparePriceDisplay = section.querySelector('[data-compare-price]');
       if (comparePriceDisplay) {
         if (comparePrice && parseFloat(comparePrice) > parseFloat(variantPrice)) {
           const compareAmount = parseFloat(comparePrice) / 100;
@@ -1244,13 +1248,13 @@
       const variantImage = button.dataset.variantImage;
       if (variantImage) {
         // Update desktop main image
-        const mainImage = document.querySelector('[data-main-image]');
+        const mainImage = section.querySelector('[data-main-image]');
         if (mainImage) {
           mainImage.src = variantImage;
         }
 
         // Update mobile gallery - find and scroll to matching image
-        const scrollContainer = document.querySelector('[data-gallery-scroll]');
+        const scrollContainer = section.querySelector('[data-gallery-scroll]');
         if (scrollContainer) {
           const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
           let matchingIndex = 0;
@@ -1273,7 +1277,7 @@
               behavior: 'smooth'
             });
             
-            const dots = document.querySelectorAll('[data-dot-index]');
+            const dots = section.querySelectorAll('[data-dot-index]');
             dots.forEach((dot, i) => {
               if (i === matchingIndex) {
                 dot.classList.add('active');
@@ -1285,7 +1289,7 @@
         }
         
         // Update desktop thumbnails
-        const thumbnails = document.querySelectorAll('[data-thumbnail]');
+        const thumbnails = section.querySelectorAll('[data-thumbnail]');
         if (thumbnails.length > 0) {
           thumbnails.forEach((thumb, index) => {
             const thumbImg = thumb.querySelector('img');
@@ -1318,7 +1322,7 @@
           
           // Select the corresponding pack card
           packCards.forEach((c) => c.classList.remove('active'));
-          const packCard = document.querySelector(`[data-pack-card][data-pack-type="${packType}"]`);
+          const packCard = section.querySelector(`[data-pack-card][data-pack-type="${packType}"]`);
           if (packCard) {
             packCard.classList.add('active');
           }
@@ -1357,24 +1361,10 @@
     
     // Initialize: Select 'combo2' (Most Popular) pack by default and 'Chocolate Indulgence' flavor if no variant was auto-selected
     if (!variantAutoSelected) {
-      const combo2PackCard = document.querySelector('[data-pack-card][data-pack-type="combo2"]');
+      const combo2PackCard = section.querySelector('[data-pack-card][data-pack-type="combo2"]');
       if (combo2PackCard) {
-        combo2PackCard.classList.add('active');
-        selectedPackType = 'combo2';
-        
-        // Show flavor container
-        if (flavorContainer) {
-          flavorContainer.style.display = 'block';
-        }
-        
-        // Show only combo2 pack flavors
-        flavorButtons.forEach((btn) => {
-          if (btn.dataset.packType === 'combo2') {
-            btn.style.display = 'inline-block';
-          } else {
-            btn.style.display = 'none';
-          }
-        });
+        // Trigger generic click logic to set everything up natively
+        combo2PackCard.click();
 
         // Try to auto-select "Chocolate Indulgence"
         const chocIndulgenceBtn = Array.from(flavorButtons).find(btn => 
@@ -1382,27 +1372,15 @@
         );
 
         if (chocIndulgenceBtn && chocIndulgenceBtn.dataset.variantAvailable === 'true') {
-          chocIndulgenceBtn.classList.add('active');
-          selectedFlavor = chocIndulgenceBtn.dataset.flavorName;
-          if (flavorDisplay) {
-            flavorDisplay.textContent = selectedFlavor;
-          }
-          updateVariant(chocIndulgenceBtn);
-        } else {
-          // Fallback: disable add to cart until a flavor is manually selected
-          if (addToCartButton) {
-            addToCartButton.disabled = true;
-            const btnText = addToCartButton.querySelector('.btn-text');
-            if (btnText) btnText.textContent = 'SELECT A FLAVOR';
-          }
+          chocIndulgenceBtn.click();
         }
       }
     }
 
     // Quantity Controls
-    const quantityInput = document.querySelector('[data-quantity-input]');
-    const minusButton = document.querySelector('[data-quantity-minus]');
-    const plusButton = document.querySelector('[data-quantity-plus]');
+    const quantityInput = section.querySelector('[data-quantity-input]');
+    const minusButton = section.querySelector('[data-quantity-minus]');
+    const plusButton = section.querySelector('[data-quantity-plus]');
 
     if (minusButton && quantityInput) {
       minusButton.addEventListener('click', function () {
@@ -1421,7 +1399,7 @@
     }
 
     // Accordion functionality
-    const accordionTriggers = document.querySelectorAll('[data-accordion-trigger]');
+    const accordionTriggers = section.querySelectorAll('[data-accordion-trigger]');
 
     accordionTriggers.forEach((trigger) => {
       trigger.addEventListener('click', function () {

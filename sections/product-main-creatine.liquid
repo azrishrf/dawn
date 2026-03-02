@@ -230,6 +230,8 @@
   </div>
 </div>
 
+{% render 'custom-cart-drawer' %}
+
 <style>
   .product-creatine-section {
     background-color: #fff;
@@ -863,15 +865,17 @@
     const form = document.getElementById('product-form-creatine');
     if (!form) return;
 
+    const section = form.closest('.product-creatine-section') || document;
+
     // Pack and Weight Selection
-    const packCards = document.querySelectorAll('[data-pack-card]');
-    const weightContainer = document.querySelector('[data-weight-container]');
-    const weightButtons = document.querySelectorAll('[data-weight-button]');
-    const weightDisplay = document.querySelector('[data-weight-display]');
+    const packCards = section.querySelectorAll('[data-pack-card]');
+    const weightContainer = section.querySelector('[data-weight-container]');
+    const weightButtons = section.querySelectorAll('[data-weight-button]');
+    const weightDisplay = section.querySelector('[data-weight-display]');
     // Target the hidden variant id input (required for cart form submission)
     const variantInput = form.querySelector('[data-creatine-variant-input]');
-    const priceDisplay = document.querySelector('[data-product-price]');
-    const addToCartButton = document.querySelector('[data-add-to-cart]');
+    const priceDisplay = section.querySelector('[data-product-price]');
+    const addToCartButton = section.querySelector('[data-add-to-cart]');
     const btnText = addToCartButton ? addToCartButton.querySelector('.btn-text') : null;
 
     let selectedPackType = 'single'; // Default to single pack
@@ -909,7 +913,7 @@
             }
 
             // Update compare price for single pack
-            const comparePriceDisplay = document.querySelector('[data-compare-price]');
+            const comparePriceDisplay = section.querySelector('[data-compare-price]');
             if (comparePriceDisplay) {
               if (singleVariant.compare_at_price && parseFloat(singleVariant.compare_at_price) > parseFloat(singleVariant.price)) {
                 const comparePrice = parseFloat(singleVariant.compare_at_price) / 100;
@@ -932,7 +936,7 @@
             }
 
             if (singleVariant.featured_image) {
-              const mainImage = document.querySelector('[data-main-image]');
+              const mainImage = section.querySelector('[data-main-image]');
               if (mainImage) mainImage.src = singleVariant.featured_image.src;
             }
           } else {
@@ -966,7 +970,7 @@
             }
 
             // Update compare price
-            const comparePriceDisplay = document.querySelector('[data-compare-price]');
+            const comparePriceDisplay = section.querySelector('[data-compare-price]');
             if (comparePriceDisplay && bestValueVariant.compare_at_price) {
               if (parseFloat(bestValueVariant.compare_at_price) > parseFloat(bestValueVariant.price)) {
                 const comparePrice = parseFloat(bestValueVariant.compare_at_price) / 100;
@@ -991,7 +995,7 @@
 
             // Update main image if variant has featured image
             if (bestValueVariant.featured_image) {
-              const mainImage = document.querySelector('[data-main-image]');
+              const mainImage = section.querySelector('[data-main-image]');
               if (mainImage) {
                 mainImage.src = bestValueVariant.featured_image.src;
               }
@@ -1029,7 +1033,7 @@
 
       // Update compare at price if it exists
       const comparePrice = button.dataset.variantComparePrice;
-      const comparePriceDisplay = document.querySelector('[data-compare-price]');
+      const comparePriceDisplay = section.querySelector('[data-compare-price]');
       if (comparePriceDisplay) {
         if (comparePrice && parseFloat(comparePrice) > parseFloat(variantPrice)) {
           const compareAmount = parseFloat(comparePrice) / 100;
@@ -1055,13 +1059,13 @@
       const variantImage = button.dataset.variantImage;
       if (variantImage) {
         // Update desktop main image
-        const mainImage = document.querySelector('[data-main-image]');
+        const mainImage = section.querySelector('[data-main-image]');
         if (mainImage) {
           mainImage.src = variantImage;
         }
 
         // Update mobile gallery - find and scroll to matching image
-        const scrollContainer = document.querySelector('[data-gallery-scroll]');
+        const scrollContainer = section.querySelector('[data-gallery-scroll]');
         if (scrollContainer) {
           const galleryImages = scrollContainer.querySelectorAll('.gallery-image');
           let matchingIndex = 0;
@@ -1083,7 +1087,7 @@
         }
 
         // Update desktop thumbnails
-        const thumbnails = document.querySelectorAll('[data-thumbnail]');
+        const thumbnails = section.querySelectorAll('[data-thumbnail]');
         if (thumbnails.length > 0) {
           thumbnails.forEach((thumb, index) => {
             thumb.classList.remove('active');
@@ -1110,7 +1114,7 @@
 
         if (weight === '500g + FREE 100g') {
           // Select Best Value pack
-          const bestValueCard = document.querySelector('[data-pack-card][data-pack-type="best-value"]');
+          const bestValueCard = section.querySelector('[data-pack-card][data-pack-type="best-value"]');
           if (bestValueCard && !bestValueCard.classList.contains('pack-option-disabled')) {
             bestValueCard.classList.add('active');
             selectedPackType = 'best-value';
@@ -1127,7 +1131,7 @@
           variantAutoSelected = true;
         } else if (weight === '500g') {
           // Select Single pack (500g)
-          const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
+          const singlePackCard = section.querySelector('[data-pack-card][data-pack-type="single"]');
           if (singlePackCard && !singlePackCard.classList.contains('pack-option-disabled')) {
             singlePackCard.classList.add('active');
             selectedPackType = 'single';
@@ -1149,42 +1153,16 @@
 
     // Initialize: Select single pack by default if no variant was auto-selected
     if (!variantAutoSelected) {
-      const singlePackCard = document.querySelector('[data-pack-card][data-pack-type="single"]');
+      const singlePackCard = section.querySelector('[data-pack-card][data-pack-type="single"]');
       if (singlePackCard && !singlePackCard.classList.contains('pack-option-disabled')) {
-        singlePackCard.classList.add('active');
-        selectedPackType = 'single';
-
-        // Hide weight container (Single is now 500g only, no weight selection needed)
-        if (weightContainer) weightContainer.style.display = 'none';
-
-        // Auto-select the 500g single variant
-        const allVariants = {{ product.variants | json }};
-        const singleVariant = allVariants.find(v => v.option1 === '500g');
-
-        if (singleVariant) {
-          if (variantInput) variantInput.value = singleVariant.id;
-          if (priceDisplay) {
-            priceDisplay.textContent = 'RM ' + (parseFloat(singleVariant.price) / 100).toFixed(2);
-          }
-          if (addToCartButton) {
-            const btnText = addToCartButton.querySelector('.btn-text');
-            addToCartButton.disabled = !singleVariant.available;
-            if (btnText) btnText.textContent = singleVariant.available ? 'ADD TO CART' : 'SOLD OUT';
-          }
-        } else {
-          if (addToCartButton) {
-            const btnText = addToCartButton.querySelector('.btn-text');
-            addToCartButton.disabled = true;
-            if (btnText) btnText.textContent = 'NOT AVAILABLE';
-          }
-        }
+        singlePackCard.click();
       }
     }
 
     // Quantity Controls
-    const quantityInput = document.querySelector('[data-quantity-input]');
-    const minusButton = document.querySelector('[data-quantity-minus]');
-    const plusButton = document.querySelector('[data-quantity-plus]');
+    const quantityInput = section.querySelector('[data-quantity-input]');
+    const minusButton = section.querySelector('[data-quantity-minus]');
+    const plusButton = section.querySelector('[data-quantity-plus]');
 
     if (minusButton && quantityInput) {
       minusButton.addEventListener('click', function () {
