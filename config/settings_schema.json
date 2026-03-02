@@ -1556,5 +1556,48 @@
         "info": "Leave blank to show all. E.g., 'Medium, Large'"
       }
     ]
+  },
+  {
+    "name": "Firebase Configuration",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Firebase App Settings"
+      },
+      {
+        "type": "paragraph",
+        "content": "Add your Firebase web app keys here for the Flash Sale popup. It is safe because we use Firestore Security Rules."
+      },
+      {
+        "type": "text",
+        "id": "firebase_api_key",
+        "label": "API Key"
+      },
+      {
+        "type": "text",
+        "id": "firebase_auth_domain",
+        "label": "Auth Domain"
+      },
+      {
+        "type": "text",
+        "id": "firebase_project_id",
+        "label": "Project ID"
+      },
+      {
+        "type": "text",
+        "id": "firebase_storage_bucket",
+        "label": "Storage Bucket"
+      },
+      {
+        "type": "text",
+        "id": "firebase_messaging_sender_id",
+        "label": "Messaging Sender ID"
+      },
+      {
+        "type": "text",
+        "id": "firebase_app_id",
+        "label": "App ID"
+      }
+    ]
   }
 ]

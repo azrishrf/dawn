@@ -464,6 +464,14 @@
   class="header-wrapper {% if template == 'index' %}header-absolute{% else %}header-absolute-red{% endif %}"
   id="mainHeader"
 >
+  <!-- The Sleek Sticky Countdown Banner -->
+  <div id="protein-countdown-banner" class="protein-banner hidden">
+    <div class="banner-content">
+      <span class="banner-text">🔥 Hurry! Your RM2 discount expires in:</span>
+      <div class="timer-display"><span id="timer-minutes">02</span>:<span id="timer-seconds">00</span></div>
+    </div>
+  </div>
+
   <div class="header-container">
     <!-- Mobile Menu Trigger -->
     <button
@@ -663,6 +671,9 @@
     }
   });
 </script>
+
+{% comment %} {% render 'custom-cart-drawer' %} {% endcomment %}
+{% render 'protein-discount' %}
 
 {% schema %}
 {

@@ -1,0 +1,321 @@
+{% comment %}
+  protein-discount.liquid
+{% endcomment %}
+
+{% if customer %}
+  <script>
+    window.currentUserId = '{{ customer.id }}';
+  </script>
+{% else %}
+  <script>
+    // Generate a beautiful little cookie ID for our guest guests!
+    if (!localStorage.getItem('guestUserId')) {
+      localStorage.setItem('guestUserId', 'guest_' + Math.random().toString(36).substr(2, 9));
+    }
+    window.currentUserId = localStorage.getItem('guestUserId');
+  </script>
+{% endif %}
+
+<!-- The Glassmorphism Popup -->
+<div id="protein-discount-popup" class="protein-popup-overlay hidden">
+  <div class="protein-popup-content">
+    <div class="popup-icon">🎁</div>
+    <h2 class="popup-title">Flash Sale Activated!</h2>
+    <p class="popup-text">Claim your <strong>RM2 OFF</strong> right now. You only have 2 minutes to check out!</p>
+    <button id="apply-discount-btn" class="popup-btn">Apply RM2 Discount</button>
+  </div>
+</div>
+
+
+<style>
+  /* My custom CSS - soft, modern, and beautiful */
+  .protein-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px); /* Sweet glass effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .protein-popup-overlay.visible {
+    opacity: 1;
+  }
+
+  .protein-popup-overlay.hidden {
+    display: none;
+  }
+
+  .protein-popup-content {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .protein-popup-overlay.visible .protein-popup-content {
+    transform: translateY(0);
+  }
+
+  .popup-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+  }
+  .popup-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111;
+    margin: 0 0 10px;
+    font-family: 'Inter', sans-serif;
+  }
+  .popup-text {
+    font-size: 16px;
+    color: #666;
+    margin: 0 0 25px;
+    line-height: 1.5;
+  }
+
+  .popup-btn {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
+  }
+
+  /* The Banner */
+  .protein-banner {
+    width: 100%;
+    background: #111;
+    color: white;
+    padding: 12px 20px;
+    z-index: 101; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .protein-banner.hidden {
+    display: none;
+  }
+
+  .protein-banner.hidden {
+    display: none;
+  }
+
+  .banner-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .banner-text {
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .timer-display {
+    background: #333;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4b2b;
+    letter-spacing: 1px;
+  }
+</style>
+
+<script type="module">
+  // Import Firebase from CDN for effortless modular usage
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+  } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
+
+  // We use Shopify Theme Settings to inject the credentials securely!
+  // This keeps your .env-like secrets out of the raw codebase.
+  const firebaseConfig = {
+    apiKey: '{{ settings.firebase_api_key }}',
+    authDomain: '{{ settings.firebase_auth_domain }}',
+    projectId: '{{ settings.firebase_project_id }}',
+    storageBucket: '{{ settings.firebase_storage_bucket }}',
+    messagingSenderId: '{{ settings.firebase_messaging_sender_id }}',
+    appId: '{{ settings.firebase_app_id }}',
+  };
+
+  // Initialize Firebase (Hana's territory!)
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const userId = window.currentUserId;
+  const docRef = doc(db, 'discount_sessions', userId);
+
+  const popup = document.getElementById('protein-discount-popup');
+  const banner = document.getElementById('protein-countdown-banner');
+  const applyBtn = document.getElementById('apply-discount-btn');
+  const minutesEl = document.getElementById('timer-minutes');
+  const secondsEl = document.getElementById('timer-seconds');
+
+  const DISCOUNT_DURATION_MS = 2 * 60 * 1000; // 2 minutes for testing!
+
+  async function checkDiscountState() {
+    try {
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        // ONLY show the popup if they are actually looking at a protein product!
+        const isProteinPage = window.location.pathname.includes('/products/') && window.location.pathname.includes('protein');
+        
+        if (isProteinPage) {
+          setTimeout(() => popup.classList.remove('hidden'), 500);
+          // Slight delay for a smooth entrance animation
+          setTimeout(() => popup.classList.add('visible'), 550);
+        }
+      } else {
+        const data = docSnap.data();
+        if (data.discountExpired) {
+          // Offer is over, keep everything hidden
+          return;
+        }
+
+        const now = Date.now();
+        const timePassed = now - data.discountActivatedAt;
+
+        if (timePassed < DISCOUNT_DURATION_MS) {
+          // Timer still going! Resume countdown INSTANTLY without bouncing
+          startCountdown(data.discountActivatedAt, true);
+        } else {
+          // Timer naturally expired while they were away
+          expireDiscount();
+        }
+      }
+    } catch (error) {
+      console.error('Oops! Firebase error: ', error);
+    }
+  }
+
+  async function applyDiscount() {
+    // 1. Update UI instantly so it feels super responsive
+    popup.classList.remove('visible');
+    setTimeout(() => popup.classList.add('hidden'), 300);
+
+    // Change button text briefly to show action
+    applyBtn.innerText = 'Applying...';
+
+    const now = Date.now();
+
+    // 2. Save securely to Firebase Database
+    await setDoc(docRef, {
+      userId: userId,
+      hasSeenPopup: true,
+      discountActivatedAt: now,
+      discountExpired: false,
+    });
+
+    // 3. Update Shopify Cart Attribute so our Backend Function knows!
+    await fetch(window.Shopify.routes.root + 'cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        attributes: { protein_flash_sale: 'active' },
+      }),
+    });
+
+    // 4. Start visual countdown
+    startCountdown(now);
+  }
+
+  function startCountdown(startTime, isInitialLoad = false) {
+    if (isInitialLoad) {
+      // Just snap it in, no smooth animation
+      banner.style.transition = 'none';
+      banner.classList.remove('hidden');
+      banner.classList.add('visible');
+      // Restore transition for later (like if it expires)
+      setTimeout(() => banner.style.transition = '', 50);
+    } else {
+      banner.classList.remove('hidden');
+      setTimeout(() => banner.classList.add('visible'), 50);
+    }
+
+    function tickTimer() {
+      const now = Date.now();
+      const timePassed = now - startTime;
+      const timeLeft = DISCOUNT_DURATION_MS - timePassed;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        expireDiscount();
+      } else {
+        const m = Math.floor((timeLeft / 1000 / 60) % 60);
+        const s = Math.floor((timeLeft / 1000) % 60);
+
+        minutesEl.innerText = m.toString().padStart(2, '0');
+        secondsEl.innerText = s.toString().padStart(2, '0');
+      }
+    }
+
+    // Run immediately once so it doesn't flash "02:00" for a whole second!
+    tickTimer();
+    const interval = setInterval(tickTimer, 1000);
+  }
+
+  async function expireDiscount() {
+    // Hide banner smoothly
+    banner.classList.remove('visible');
+    setTimeout(() => banner.classList.add('hidden'), 400);
+
+    // Update Firebase to lock them out forever
+    await updateDoc(docRef, { discountExpired: true });
+
+    // Tell Shopify Card the discount is dead
+    await fetch(window.Shopify.routes.root + 'cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        attributes: { protein_flash_sale: 'expired' },
+      }),
+    });
+
+    // Refresh the page so the cart removes the discount from the UI instantly!
+    window.location.reload();
+  }
+
+  // Bind the Apply Button Click Event
+  if (applyBtn) {
+    applyBtn.addEventListener('click', applyDiscount);
+  }
+
+  // Run the check as soon as the snippet loads!
+  checkDiscountState();
+</script>
