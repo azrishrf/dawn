@@ -242,13 +242,24 @@
       discountExpired: false,
     });
 
-    // 3. Update Shopify Cart Attribute so our Backend Function knows!
+    {% comment %} // 3. Update Shopify Cart Attribute so our Backend Function knows!
     await fetch(window.Shopify.routes.root + 'cart/update.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        attributes: { protein_flash_sale: 'active' },
+        attributes: { 
+          protein_flash_sale: 'active',
+          protein_flash_sale_started: String(now) 
+        },
       }),
+    }); {% endcomment %}
+    // 3. Update Shopify Cart Attribute so our Backend Function knows!
+    const formData = new FormData();
+    formData.append('attributes[protein_flash_sale]', 'active');
+    formData.append('attributes[protein_flash_sale_started]', String(now));
+    await fetch(window.Shopify.routes.root + 'cart/update.js', {
+      method: 'POST',
+      body: formData, // No need for Content-Type headers, fetch handles FormData!
     });
 
     // 4. Start visual countdown
@@ -303,7 +314,10 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        attributes: { protein_flash_sale: 'expired' },
+        attributes: { 
+          protein_flash_sale: 'expired',
+          protein_flash_sale_started: ''
+        },
       }),
     });
 
